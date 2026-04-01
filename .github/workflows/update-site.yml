@@ -1,0 +1,57 @@
+name: Update Dashboard
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # Daily at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Checkout gh-pages snapshots
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: _gh_pages
+        continue-on-error: true  # First run: gh-pages branch won't exist yet
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch release data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python releases.py --json --output-dir _site/ --num-releases 0
+
+      - name: Build site (snapshots + history)
+        run: |
+          # Use existing snapshots from gh-pages if available, else empty dir
+          SNAP_DIR="_gh_pages/snapshots"
+          if [ ! -d "$SNAP_DIR" ]; then
+            mkdir -p "$SNAP_DIR"
+          fi
+          python build_site.py --site-dir _site/ --snapshots-dir "$SNAP_DIR"
+          # Copy snapshots into _site so they persist on gh-pages
+          cp -r "$SNAP_DIR" _site/snapshots
+
+      - name: Copy index.html
+        run: cp site/index.html _site/index.html
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
