@@ -169,6 +169,13 @@ def main():
 
     # Compute weekly history
     weekly = compute_weekly_history(snapshots)
+
+    # Ensure all repos appear in history even if no weekly data yet
+    for repo_data in data_json.get("repos", []):
+        repo_name = repo_data["repo"]
+        if repo_name not in weekly:
+            weekly[repo_name] = {}
+
     history = build_history_json(weekly)
 
     history_path = os.path.join(args.site_dir, "history.json")
