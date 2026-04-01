@@ -6,17 +6,13 @@ import datetime as dt
 import json
 import os
 import re
+import sys
 import time
 import urllib.request
 import numpy as np
 import matplotlib.pyplot as plt
 
 API_BASE = "https://api.github.com"
-
-DEFAULT_REPOS = [
-    "Azure/aks-desktop",
-    "kubernetes-sigs/headlamp",
-]
 
 PLATFORMS = ["linux", "mac", "win"]
 PLATFORM_COLORS = {
@@ -54,7 +50,24 @@ def parse_args():
         dest="num_releases",
         help="Number of most recent releases to show (default: 6). Use 0 for all.",
     )
+    parser.add_argument(
+        "--output-dir",
+        dest="output_dir",
+        help="Write JSON output to data.json in this directory instead of stdout.",
+    )
     return parser.parse_args()
+
+
+def read_repos_csv(path="repos.csv"):
+    """Read repo list from a CSV file with a 'repo' column."""
+    repos = []
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            repo = row["repo"].strip()
+            if repo:
+                repos.append(repo)
+    return repos
 
 
 def github_headers():
@@ -285,7 +298,18 @@ def print_text_report(summary):
 
 def main():
     args = parse_args()
-    repos = args.repos or DEFAULT_REPOS
+
+    # Repo resolution: --repo flags > repos.csv > error
+    if args.repos:
+        repos = args.repos
+    elif os.path.exists("repos.csv"):
+        repos = read_repos_csv("repos.csv")
+        if not repos:
+            print("Error: repos.csv is empty.", file=sys.stderr)
+            sys.exit(1)
+    else:
+        print("Error: No repos specified. Use --repo or create a repos.csv file.", file=sys.stderr)
+        sys.exit(1)
 
     summaries = []
     for repo in repos:
@@ -297,7 +321,20 @@ def main():
             summary["releases"] = summary["releases"][-args.num_releases:]
 
     if args.json:
-        print(json.dumps(summaries, indent=2))
+        output = {
+            "generated_at": dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "repos": summaries,
+        }
+        json_str = json.dumps(output, indent=2)
+
+        if args.output_dir:
+            os.makedirs(args.output_dir, exist_ok=True)
+            out_path = os.path.join(args.output_dir, "data.json")
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(json_str)
+            print("Wrote {}".format(out_path))
+        else:
+            print(json_str)
         return
 
     chart_files = []
