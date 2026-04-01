@@ -1,0 +1,14 @@
+# Build output
+_site/
+_test_site/
+_test_snapshots/
+_gh_pages/
+
+# Generated reports
+*.png
+*_downloads_by_release.csv
+*_approx_release_month_downloads.csv
+
+# Python
+__pycache__/
+*.pyc
