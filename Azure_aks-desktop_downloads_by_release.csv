@@ -1,0 +1,7 @@
+repo,tag,published_at,prerelease,linux,mac,win,total
+Azure/aks-desktop,v0.1.0-alpha,2025-11-19T22:51:24Z,False,26,695,743,1464
+Azure/aks-desktop,v0.2.0-alpha,2026-02-27T23:36:06Z,False,9,211,40,260
+Azure/aks-desktop,v0.3.0-beta,2026-03-16T20:40:44Z,False,0,34,3,37
+Azure/aks-desktop,v0.4.0-beta,2026-03-19T16:25:52Z,False,1,15,6,22
+Azure/aks-desktop,v0.5.0,2026-03-20T23:34:32Z,False,11,108,52,171
+Azure/aks-desktop,v0.6.0,2026-03-31T13:40:33Z,False,0,68,10,78
