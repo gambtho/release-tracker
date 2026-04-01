@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub Release Downloads Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    padding: 2rem;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  .header .updated {
+    color: #8b949e;
+    font-size: 0.85rem;
+  }
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin: 0 auto 2rem auto;
+    max-width: 1100px;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .card-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  .card-header h2 a {
+    color: #58a6ff;
+    text-decoration: none;
+  }
+  .card-header h2 a:hover {
+    text-decoration: underline;
+  }
+  .stat {
+    font-size: 1.1rem;
+    color: #8b949e;
+  }
+  .stat strong {
+    color: #e6edf3;
+    font-size: 1.35rem;
+  }
+  .chart-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  .chart-label {
+    font-size: 0.8rem;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .loading {
+    text-align: center;
+    color: #8b949e;
+    padding: 4rem 0;
+    font-size: 1rem;
+  }
+  .error {
+    text-align: center;
+    color: #f85149;
+    padding: 4rem 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>GitHub Release Downloads</h1>
+  <div class="updated" id="updated"></div>
+</div>
+<div id="content">
+  <div class="loading">Loading data&hellip;</div>
+</div>
+
+<script>
+const COLORS = {
+  linux: { bg: '#F5A623', bgFaded: 'rgba(245,166,35,0.45)' },
+  mac:   { bg: '#4A90D9', bgFaded: 'rgba(74,144,217,0.45)' },
+  win:   { bg: '#7ED321', bgFaded: 'rgba(126,211,33,0.45)' },
+};
+
+const CHART_DEFAULTS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      labels: { color: '#8b949e', padding: 16, usePointStyle: true, pointStyle: 'rectRounded' }
+    },
+    tooltip: {
+      backgroundColor: '#1c2128',
+      titleColor: '#e6edf3',
+      bodyColor: '#e6edf3',
+      borderColor: '#30363d',
+      borderWidth: 1,
+      padding: 10,
+      callbacks: {
+        footer: function(items) {
+          let sum = 0;
+          items.forEach(i => sum += i.parsed.y);
+          return 'Total: ' + sum.toLocaleString();
+        }
+      }
+    }
+  },
+  scales: {
+    x: {
+      stacked: true,
+      ticks: { color: '#8b949e', maxRotation: 45 },
+      grid: { color: 'rgba(48,54,61,0.5)' },
+    },
+    y: {
+      stacked: true,
+      ticks: { color: '#8b949e', callback: v => v.toLocaleString() },
+      grid: { color: 'rgba(48,54,61,0.5)' },
+    }
+  }
+};
+
+function fmt(n) { return Number(n).toLocaleString(); }
+
+function makeReleaseChart(canvas, repoData) {
+  const releases = repoData.releases;
+  const labels = releases.map(r => r.prerelease ? r.tag + ' (pre)' : r.tag);
+
+  function colorArr(base, faded) {
+    return releases.map(r => r.prerelease ? faded : base);
+  }
+
+  new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Linux', data: releases.map(r => r.linux),  backgroundColor: colorArr(COLORS.linux.bg, COLORS.linux.bgFaded) },
+        { label: 'Mac',   data: releases.map(r => r.mac),    backgroundColor: colorArr(COLORS.mac.bg, COLORS.mac.bgFaded) },
+        { label: 'Win',   data: releases.map(r => r.win),    backgroundColor: colorArr(COLORS.win.bg, COLORS.win.bgFaded) },
+      ]
+    },
+    options: {
+      ...CHART_DEFAULTS,
+      scales: {
+        ...CHART_DEFAULTS.scales,
+        x: { ...CHART_DEFAULTS.scales.x, ticks: { ...CHART_DEFAULTS.scales.x.ticks, font: { size: releases.length > 30 ? 9 : 11 } } }
+      }
+    }
+  });
+}
+
+function makeWeeklyChart(canvas, weeklyData) {
+  const weeks = weeklyData.weeks;
+  const labels = weeks.map(w => {
+    const d = new Date(w.week + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  });
+
+  new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Linux', data: weeks.map(w => w.linux), backgroundColor: COLORS.linux.bg },
+        { label: 'Mac',   data: weeks.map(w => w.mac),   backgroundColor: COLORS.mac.bg },
+        { label: 'Win',   data: weeks.map(w => w.win),   backgroundColor: COLORS.win.bg },
+      ]
+    },
+    options: CHART_DEFAULTS
+  });
+}
+
+function buildCard(repoData, weeklyData) {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const repoUrl = 'https://github.com/' + repoData.repo;
+  let html = '<div class="card-header">'
+    + '<h2><a href="' + repoUrl + '" target="_blank">' + repoData.repo + '</a></h2>'
+    + '<div class="stat">Total Downloads: <strong>' + fmt(repoData.approx_all_time_release_downloads) + '</strong></div>'
+    + '</div>';
+
+  // Release chart
+  const releaseId = 'release-' + repoData.repo.replace(/\//g, '-');
+  html += '<div class="chart-container">'
+    + '<div class="chart-label">Downloads by Release</div>'
+    + '<div style="position:relative;height:' + Math.max(300, repoData.releases.length * 8) + 'px">'
+    + '<canvas id="' + releaseId + '"></canvas>'
+    + '</div></div>';
+
+  // Weekly chart placeholder
+  const weeklyId = 'weekly-' + repoData.repo.replace(/\//g, '-');
+  if (weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2) {
+    html += '<div class="chart-container">'
+      + '<div class="chart-label">Downloads per Week</div>'
+      + '<div style="position:relative;height:260px">'
+      + '<canvas id="' + weeklyId + '"></canvas>'
+      + '</div></div>';
+  }
+
+  card.innerHTML = html;
+  return card;
+}
+
+async function init() {
+  const content = document.getElementById('content');
+  try {
+    const [dataResp, histResp] = await Promise.all([
+      fetch('./data.json'),
+      fetch('./history.json').catch(() => null)
+    ]);
+
+    if (!dataResp.ok) throw new Error('Failed to load data.json');
+    const data = await dataResp.json();
+
+    let history = { repos: [] };
+    if (histResp && histResp.ok) {
+      history = await histResp.json();
+    }
+
+    // Update header
+    if (data.generated_at) {
+      const d = new Date(data.generated_at);
+      document.getElementById('updated').textContent = 'Last updated: ' + d.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+      });
+    }
+
+    content.innerHTML = '';
+
+    for (const repoData of data.repos) {
+      const weeklyData = history.repos.find(r => r.repo === repoData.repo);
+      const card = buildCard(repoData, weeklyData);
+      content.appendChild(card);
+
+      // Render charts after DOM insertion
+      const releaseId = 'release-' + repoData.repo.replace(/\//g, '-');
+      const releaseCanvas = document.getElementById(releaseId);
+      if (releaseCanvas) makeReleaseChart(releaseCanvas, repoData);
+
+      const weeklyId = 'weekly-' + repoData.repo.replace(/\//g, '-');
+      const weeklyCanvas = document.getElementById(weeklyId);
+      if (weeklyCanvas && weeklyData) makeWeeklyChart(weeklyCanvas, weeklyData);
+    }
+
+  } catch (err) {
+    content.innerHTML = '<div class="error">Error: ' + err.message + '</div>';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
