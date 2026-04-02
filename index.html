@@ -73,6 +73,31 @@
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
   }
+  .toggle-bar {
+    display: inline-flex;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+  .toggle-btn {
+    padding: 0.35rem 1rem;
+    font-size: 0.8rem;
+    font-family: inherit;
+    color: #8b949e;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .toggle-btn:hover {
+    color: #e6edf3;
+  }
+  .toggle-btn.active {
+    background: #30363d;
+    color: #e6edf3;
+  }
   .loading {
     text-align: center;
     color: #8b949e;
@@ -142,7 +167,7 @@ const CHART_DEFAULTS = {
 
 function fmt(n) { return Number(n).toLocaleString(); }
 
-function makeReleaseChart(canvas, repoData) {
+function buildReleaseChartConfig(repoData) {
   const releases = repoData.releases;
   const labels = releases.map(r => r.prerelease ? r.tag + ' (pre)' : r.tag);
 
@@ -150,7 +175,7 @@ function makeReleaseChart(canvas, repoData) {
     return releases.map(r => r.prerelease ? faded : base);
   }
 
-  new Chart(canvas, {
+  return {
     type: 'bar',
     data: {
       labels,
@@ -167,17 +192,17 @@ function makeReleaseChart(canvas, repoData) {
         x: { ...CHART_DEFAULTS.scales.x, ticks: { ...CHART_DEFAULTS.scales.x.ticks, font: { size: releases.length > 30 ? 9 : 11 } } }
       }
     }
-  });
+  };
 }
 
-function makeWeeklyChart(canvas, weeklyData) {
+function buildWeeklyChartConfig(weeklyData) {
   const weeks = weeklyData.weeks;
   const labels = weeks.map(w => {
     const d = new Date(w.week + 'T00:00:00');
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   });
 
-  new Chart(canvas, {
+  return {
     type: 'bar',
     data: {
       labels,
@@ -188,7 +213,38 @@ function makeWeeklyChart(canvas, weeklyData) {
       ]
     },
     options: CHART_DEFAULTS
+  };
+}
+
+function setupToggle(chartId, repoData, weeklyData) {
+  const canvas = document.getElementById(chartId);
+  if (!canvas) return;
+
+  const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
+  let chart = new Chart(canvas, buildReleaseChartConfig(repoData));
+
+  // Find toggle buttons
+  const container = canvas.closest('.chart-container');
+  if (!container) return;
+  const btnRelease = container.querySelector('[data-view="release"]');
+  const btnWeekly = container.querySelector('[data-view="weekly"]');
+  if (!btnRelease) return;
+
+  btnRelease.addEventListener('click', function() {
+    btnRelease.classList.add('active');
+    if (btnWeekly) btnWeekly.classList.remove('active');
+    chart.destroy();
+    chart = new Chart(canvas, buildReleaseChartConfig(repoData));
   });
+
+  if (btnWeekly && hasWeekly) {
+    btnWeekly.addEventListener('click', function() {
+      btnWeekly.classList.add('active');
+      btnRelease.classList.remove('active');
+      chart.destroy();
+      chart = new Chart(canvas, buildWeeklyChartConfig(weeklyData));
+    });
+  }
 }
 
 function buildCard(repoData, weeklyData) {
@@ -196,28 +252,28 @@ function buildCard(repoData, weeklyData) {
   card.className = 'card';
 
   const repoUrl = 'https://github.com/' + repoData.repo;
+  const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
+  const chartId = 'chart-' + repoData.repo.replace(/\//g, '-');
+
   let html = '<div class="card-header">'
     + '<h2><a href="' + repoUrl + '" target="_blank">' + repoData.repo + '</a></h2>'
     + '<div class="stat">Total Downloads: <strong>' + fmt(repoData.approx_all_time_release_downloads) + '</strong></div>'
     + '</div>';
 
-  // Release chart
-  const releaseId = 'release-' + repoData.repo.replace(/\//g, '-');
-  html += '<div class="chart-container">'
-    + '<div class="chart-label">Downloads by Release</div>'
-    + '<div style="position:relative;height:' + Math.max(300, repoData.releases.length * 8) + 'px">'
-    + '<canvas id="' + releaseId + '"></canvas>'
-    + '</div></div>';
+  // Single chart area with toggle
+  html += '<div class="chart-container">';
 
-  // Weekly chart placeholder
-  const weeklyId = 'weekly-' + repoData.repo.replace(/\//g, '-');
-  if (weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2) {
-    html += '<div class="chart-container">'
-      + '<div class="chart-label">Downloads per Week</div>'
-      + '<div style="position:relative;height:260px">'
-      + '<canvas id="' + weeklyId + '"></canvas>'
-      + '</div></div>';
+  // Toggle buttons
+  html += '<div class="toggle-bar">'
+    + '<button class="toggle-btn active" data-view="release">By Release</button>';
+  if (hasWeekly) {
+    html += '<button class="toggle-btn" data-view="weekly">By Week</button>';
   }
+  html += '</div>';
+
+  html += '<div style="position:relative;height:' + Math.max(300, repoData.releases.length * 8) + 'px">'
+    + '<canvas id="' + chartId + '"></canvas>'
+    + '</div></div>';
 
   card.innerHTML = html;
   return card;
@@ -254,14 +310,9 @@ async function init() {
       const card = buildCard(repoData, weeklyData);
       content.appendChild(card);
 
-      // Render charts after DOM insertion
-      const releaseId = 'release-' + repoData.repo.replace(/\//g, '-');
-      const releaseCanvas = document.getElementById(releaseId);
-      if (releaseCanvas) makeReleaseChart(releaseCanvas, repoData);
-
-      const weeklyId = 'weekly-' + repoData.repo.replace(/\//g, '-');
-      const weeklyCanvas = document.getElementById(weeklyId);
-      if (weeklyCanvas && weeklyData) makeWeeklyChart(weeklyCanvas, weeklyData);
+      // Setup toggle and render initial chart
+      const chartId = 'chart-' + repoData.repo.replace(/\//g, '-');
+      setupToggle(chartId, repoData, weeklyData);
     }
 
   } catch (err) {

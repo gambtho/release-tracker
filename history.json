@@ -2,11 +2,25 @@
   "repos": [
     {
       "repo": "Azure/aks-desktop",
-      "weeks": []
+      "weeks": [
+        {
+          "week": "2026-03-30",
+          "linux": 1,
+          "mac": 11,
+          "win": 0
+        }
+      ]
     },
     {
       "repo": "kubernetes-sigs/headlamp",
-      "weeks": []
+      "weeks": [
+        {
+          "week": "2026-03-30",
+          "linux": 63,
+          "mac": 317,
+          "win": 65
+        }
+      ]
     }
   ]
 }
