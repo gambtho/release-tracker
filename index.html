@@ -216,35 +216,70 @@ function buildWeeklyChartConfig(weeklyData) {
   };
 }
 
+function aggregateMonthly(weeklyData) {
+  // Group weekly entries by YYYY-MM (based on the Monday-of-week date) and sum.
+  const byMonth = new Map();
+  for (const w of weeklyData.weeks) {
+    const ym = w.week.slice(0, 7); // 'YYYY-MM'
+    const cur = byMonth.get(ym) || { month: ym, linux: 0, mac: 0, win: 0 };
+    cur.linux += w.linux;
+    cur.mac += w.mac;
+    cur.win += w.win;
+    byMonth.set(ym, cur);
+  }
+  return Array.from(byMonth.values()).sort((a, b) => a.month.localeCompare(b.month));
+}
+
+function buildMonthlyChartConfig(weeklyData) {
+  const months = aggregateMonthly(weeklyData);
+  const labels = months.map(m => {
+    const d = new Date(m.month + '-01T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  });
+
+  return {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Linux', data: months.map(m => m.linux), backgroundColor: COLORS.linux.bg },
+        { label: 'Mac',   data: months.map(m => m.mac),   backgroundColor: COLORS.mac.bg },
+        { label: 'Win',   data: months.map(m => m.win),   backgroundColor: COLORS.win.bg },
+      ]
+    },
+    options: CHART_DEFAULTS
+  };
+}
+
 function setupToggle(chartId, repoData, weeklyData) {
   const canvas = document.getElementById(chartId);
   if (!canvas) return;
 
   const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
-  let chart = new Chart(canvas, buildReleaseChartConfig(repoData));
 
-  // Find toggle buttons
+  const builders = {
+    release: () => buildReleaseChartConfig(repoData),
+    weekly:  () => buildWeeklyChartConfig(weeklyData),
+    monthly: () => buildMonthlyChartConfig(weeklyData),
+  };
+
+  const initialView = hasWeekly ? 'weekly' : 'release';
+  let chart = new Chart(canvas, builders[initialView]());
+
   const container = canvas.closest('.chart-container');
   if (!container) return;
-  const btnRelease = container.querySelector('[data-view="release"]');
-  const btnWeekly = container.querySelector('[data-view="weekly"]');
-  if (!btnRelease) return;
+  const buttons = container.querySelectorAll('[data-view]');
 
-  btnRelease.addEventListener('click', function() {
-    btnRelease.classList.add('active');
-    if (btnWeekly) btnWeekly.classList.remove('active');
-    chart.destroy();
-    chart = new Chart(canvas, buildReleaseChartConfig(repoData));
-  });
-
-  if (btnWeekly && hasWeekly) {
-    btnWeekly.addEventListener('click', function() {
-      btnWeekly.classList.add('active');
-      btnRelease.classList.remove('active');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const view = btn.getAttribute('data-view');
+      if (!builders[view]) return;
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       chart.destroy();
-      chart = new Chart(canvas, buildWeeklyChartConfig(weeklyData));
+      chart = new Chart(canvas, builders[view]());
     });
-  }
+  });
 }
 
 function buildCard(repoData, weeklyData) {
@@ -265,9 +300,10 @@ function buildCard(repoData, weeklyData) {
 
   // Toggle buttons
   html += '<div class="toggle-bar">'
-    + '<button class="toggle-btn active" data-view="release">By Release</button>';
+    + '<button class="toggle-btn' + (hasWeekly ? '' : ' active') + '" data-view="release">By Release</button>';
   if (hasWeekly) {
-    html += '<button class="toggle-btn" data-view="weekly">By Week</button>';
+    html += '<button class="toggle-btn active" data-view="weekly">By Week</button>'
+      + '<button class="toggle-btn" data-view="monthly">By Month</button>';
   }
   html += '</div>';
 
