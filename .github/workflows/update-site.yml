@@ -4,6 +4,14 @@ on:
   schedule:
     - cron: '0 6 * * *'   # Daily at 06:00 UTC
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'build_site.py'
+      - 'releases.py'
+      - 'repos.csv'
+      - '.github/workflows/update-site.yml'
 
 permissions:
   contents: write
