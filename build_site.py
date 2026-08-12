@@ -66,87 +66,84 @@ def monday_of(date_str):
     return (d - dt.timedelta(days=d.weekday())).isoformat()
 
 
-def build_repo_index(snapshot_data):
-    """Build a dict mapping repo -> {tag -> {linux, mac, win}} from a snapshot."""
+PLATFORM_METRICS = ["linux", "mac", "win"]
+PLUGIN_METRICS = ["downloads"]
+
+
+def build_platform_index(snapshot_data):
+    """Index a platform snapshot as {(repo,): {tag: {metric: count}}}."""
     index = {}
     for repo_data in snapshot_data.get("repos", []):
-        repo_name = repo_data["repo"]
         tags = {}
         for rel in repo_data.get("releases", []):
-            tags[rel["tag"]] = {
-                "linux": rel.get("linux", 0),
-                "mac": rel.get("mac", 0),
-                "win": rel.get("win", 0),
-            }
-        index[repo_name] = tags
+            tags[rel["tag"]] = {m: rel.get(m, 0) for m in PLATFORM_METRICS}
+        index[(repo_data["repo"],)] = tags
     return index
 
 
-def diff_snapshots(older_index, newer_index):
-    """Compute per-repo, per-platform download deltas between two snapshot indexes."""
+def build_plugin_index(snapshot_data):
+    """Index a plugin snapshot as {(repo, plugin): {tag: {metric: count}}}."""
+    index = {}
+    for repo_data in snapshot_data.get("repos", []):
+        repo = repo_data["repo"]
+        for plugin_data in repo_data.get("plugins", []):
+            tags = {}
+            for rel in plugin_data.get("releases", []):
+                tags[rel["tag"]] = {m: rel.get(m, 0) for m in PLUGIN_METRICS}
+            index[(repo, plugin_data["plugin"])] = tags
+    return index
+
+
+def diff_snapshots(older_index, newer_index, metrics):
+    """Per-key, per-metric deltas. Decreases are clamped to zero (D5):
+    GitHub download counts can drop when an asset is re-uploaded."""
     result = {}
-    all_repos = set(older_index.keys()) | set(newer_index.keys())
-    for repo in all_repos:
-        old_tags = older_index.get(repo, {})
-        new_tags = newer_index.get(repo, {})
-        delta = {"linux": 0, "mac": 0, "win": 0}
-        all_tag_names = set(old_tags.keys()) | set(new_tags.keys())
-        for tag in all_tag_names:
-            old = old_tags.get(tag, {"linux": 0, "mac": 0, "win": 0})
-            new = new_tags.get(tag, {"linux": 0, "mac": 0, "win": 0})
-            for p in ("linux", "mac", "win"):
-                d = new[p] - old[p]
+    zero = {m: 0 for m in metrics}
+    for key in set(older_index) | set(newer_index):
+        old_tags = older_index.get(key, {})
+        new_tags = newer_index.get(key, {})
+        delta = {m: 0 for m in metrics}
+        for tag in set(old_tags) | set(new_tags):
+            old = old_tags.get(tag, zero)
+            new = new_tags.get(tag, zero)
+            for m in metrics:
+                d = new.get(m, 0) - old.get(m, 0)
                 if d > 0:
-                    delta[p] += d
-        result[repo] = delta
+                    delta[m] += d
+        result[key] = delta
     return result
 
 
-def compute_weekly_history(snapshots):
-    """Given sorted snapshots, compute weekly download deltas per repo per platform.
-
-    Strategy: for each consecutive pair of snapshots, compute the delta and
-    assign it to the week (Monday) of the newer snapshot. If multiple deltas
-    land in the same week, they are summed.
-    """
+def compute_weekly_history(snapshots, index_fn, metrics):
+    """Weekly deltas per key. Each consecutive pair's delta lands in the
+    ISO week (Monday) of the NEWER snapshot; same-week deltas are summed."""
     if len(snapshots) < 2:
         return {}
-
-    # repo -> week -> {linux, mac, win}
     weekly = {}
-
     for i in range(1, len(snapshots)):
-        older_date, older_data = snapshots[i - 1]
+        _, older_data = snapshots[i - 1]
         newer_date, newer_data = snapshots[i]
-
-        older_index = build_repo_index(older_data)
-        newer_index = build_repo_index(newer_data)
-        deltas = diff_snapshots(older_index, newer_index)
-
+        deltas = diff_snapshots(index_fn(older_data), index_fn(newer_data), metrics)
         week = monday_of(newer_date)
-
-        for repo, delta in deltas.items():
-            if repo not in weekly:
-                weekly[repo] = {}
-            if week not in weekly[repo]:
-                weekly[repo][week] = {"linux": 0, "mac": 0, "win": 0}
-            for p in ("linux", "mac", "win"):
-                weekly[repo][week][p] += delta[p]
-
+        for key, delta in deltas.items():
+            weeks = weekly.setdefault(key, {})
+            entry = weeks.setdefault(week, {m: 0 for m in metrics})
+            for m in metrics:
+                entry[m] += delta[m]
     return weekly
 
 
 def build_history_json(weekly):
-    """Convert the weekly dict into the history.json structure."""
+    """Platform track output: {"repos": [{"repo":..., "weeks":[...]}]}"""
     repos = []
-    for repo_name in sorted(weekly.keys()):
-        weeks_dict = weekly[repo_name]
+    for key in sorted(weekly):
+        weeks_dict = weekly[key]
         weeks = []
-        for week in sorted(weeks_dict.keys()):
+        for week in sorted(weeks_dict):
             entry = {"week": week}
             entry.update(weeks_dict[week])
             weeks.append(entry)
-        repos.append({"repo": repo_name, "weeks": weeks})
+        repos.append({"repo": key[0], "weeks": weeks})
     return {"repos": repos}
 
 
@@ -168,13 +165,11 @@ def main():
     print("Total snapshots: {}".format(len(snapshots)))
 
     # Compute weekly history
-    weekly = compute_weekly_history(snapshots)
+    weekly = compute_weekly_history(snapshots, build_platform_index, PLATFORM_METRICS)
 
     # Ensure all repos appear in history even if no weekly data yet
     for repo_data in data_json.get("repos", []):
-        repo_name = repo_data["repo"]
-        if repo_name not in weekly:
-            weekly[repo_name] = {}
+        weekly.setdefault((repo_data["repo"],), {})
 
     history = build_history_json(weekly)
 

@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-08-11T06:00:00Z",
+  "repos": [
+    {
+      "repo": "acme/tool",
+      "releases": [
+        { "tag": "v1.0", "linux": 120, "mac": 55, "win": 25 },
+        { "tag": "v1.1", "linux": 15, "mac": 8, "win": 3 },
+        { "tag": "v1.2", "linux": 4, "mac": 2, "win": 1 }
+      ]
+    },
+    {
+      "repo": "beta/app",
+      "releases": [{ "tag": "v2.0", "linux": 9, "mac": 3, "win": 2 }]
+    }
+  ]
+}
