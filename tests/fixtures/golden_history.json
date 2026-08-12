@@ -1,0 +1,38 @@
+{
+  "repos": [
+    {
+      "repo": "acme/tool",
+      "weeks": [
+        {
+          "week": "2026-08-03",
+          "linux": 15,
+          "mac": 0,
+          "win": 5
+        },
+        {
+          "week": "2026-08-10",
+          "linux": 14,
+          "mac": 11,
+          "win": 3
+        }
+      ]
+    },
+    {
+      "repo": "beta/app",
+      "weeks": [
+        {
+          "week": "2026-08-03",
+          "linux": 2,
+          "mac": 0,
+          "win": 0
+        },
+        {
+          "week": "2026-08-10",
+          "linux": 0,
+          "mac": 0,
+          "win": 0
+        }
+      ]
+    }
+  ]
+}

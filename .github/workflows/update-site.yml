@@ -10,7 +10,9 @@ on:
       - 'site/**'
       - 'build_site.py'
       - 'releases.py'
+      - 'plugins.py'
       - 'repos.csv'
+      - 'plugins.csv'
       - '.github/workflows/update-site.yml'
 
 permissions:
@@ -43,6 +45,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python releases.py --json --output-dir _site/ --num-releases 0
 
+      - name: Fetch plugin release data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python plugins.py --json --output-dir _site/ --num-releases 0
+        continue-on-error: true  # Plugin track is independent; must not block the platform deploy
+
       - name: Build site (snapshots + history)
         run: |
           # Use existing snapshots from gh-pages if available, else empty dir
@@ -50,9 +58,15 @@ jobs:
           if [ ! -d "$SNAP_DIR" ]; then
             mkdir -p "$SNAP_DIR"
           fi
-          python build_site.py --site-dir _site/ --snapshots-dir "$SNAP_DIR"
+          PLUGIN_SNAP_DIR="_gh_pages/plugin-snapshots"
+          if [ ! -d "$PLUGIN_SNAP_DIR" ]; then
+            mkdir -p "$PLUGIN_SNAP_DIR"
+          fi
+          python build_site.py --site-dir _site/ --snapshots-dir "$SNAP_DIR" \
+            --plugin-snapshots-dir "$PLUGIN_SNAP_DIR"
           # Copy snapshots into _site so they persist on gh-pages
           cp -r "$SNAP_DIR" _site/snapshots
+          cp -r "$PLUGIN_SNAP_DIR" _site/plugin-snapshots
 
       - name: Copy index.html
         run: cp site/index.html _site/index.html
