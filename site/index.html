@@ -365,7 +365,11 @@ function buildPluginMonthlyChartConfig(weeklyData) {
 }
 
 function pluginChartId(repo, plugin) {
-  return 'chart-plugin-' + (repo + '-' + plugin).replace(/[^A-Za-z0-9_-]/g, '-');
+  // Sanitize each component first: every non-alphanumeric becomes '-', so no
+  // component can contain '_'. That makes '_' a separator no component can forge,
+  // preventing (repo, plugin) pairs from colliding on the same DOM id.
+  const safe = s => s.replace(/[^A-Za-z0-9]/g, '-');
+  return 'chart-plugin-' + safe(repo) + '_' + safe(plugin);
 }
 
 function buildPluginCard(repo, pluginData, weeklyData) {
