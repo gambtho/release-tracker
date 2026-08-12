@@ -22,6 +22,15 @@ def parse_args():
         required=True,
         help="Directory with existing snapshots (from gh-pages checkout). New snapshot saved here too.",
     )
+    parser.add_argument(
+        "--plugin-snapshots-dir",
+        default=None,
+        help=(
+            "Directory with existing plugin snapshots (from gh-pages checkout). "
+            "New plugin snapshot saved here too. If omitted, the plugin track is "
+            "skipped. plugins.json is read from --site-dir."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -147,6 +156,45 @@ def build_history_json(weekly):
     return {"repos": repos}
 
 
+def build_plugins_history_json(weekly):
+    """Plugin track output, grouped by repo then plugin."""
+    by_repo = {}
+    for key in sorted(weekly):
+        repo, plugin = key
+        weeks_dict = weekly[key]
+        weeks = []
+        for week in sorted(weeks_dict):
+            entry = {"week": week}
+            entry.update(weeks_dict[week])
+            weeks.append(entry)
+        by_repo.setdefault(repo, []).append({"plugin": plugin, "weeks": weeks})
+    return {"repos": [{"repo": r, "plugins": by_repo[r]} for r in sorted(by_repo)]}
+
+
+def run_plugin_track(plugins_json, plugin_snapshots_dir, site_dir):
+    """Snapshot today's plugins.json and rewrite plugins-history.json."""
+    snap_path = save_snapshot(plugins_json, plugin_snapshots_dir)
+    print("Saved plugin snapshot: {}".format(snap_path))
+
+    snapshots = load_all_snapshots(plugin_snapshots_dir)
+    print("Total plugin snapshots: {}".format(len(snapshots)))
+
+    weekly = compute_weekly_history(snapshots, build_plugin_index, PLUGIN_METRICS)
+
+    # Ensure every plugin seen today appears even with no weekly data yet,
+    # mirroring the platform track so a brand-new plugin is not invisible.
+    for repo_data in plugins_json.get("repos", []):
+        repo = repo_data["repo"]
+        for plugin_data in repo_data.get("plugins", []):
+            weekly.setdefault((repo, plugin_data["plugin"]), {})
+
+    history = build_plugins_history_json(weekly)
+    history_path = os.path.join(site_dir, "plugins-history.json")
+    save_json(history_path, history)
+    print("Wrote {}".format(history_path))
+    return history_path
+
+
 def main():
     args = parse_args()
 
@@ -176,6 +224,18 @@ def main():
     history_path = os.path.join(args.site_dir, "history.json")
     save_json(history_path, history)
     print("Wrote {}".format(history_path))
+
+    # --- Plugin track (independent; never affects the platform output above) ---
+    if not args.plugin_snapshots_dir:
+        print("No --plugin-snapshots-dir given; skipping plugin track.")
+        return
+
+    plugins_path = os.path.join(args.site_dir, "plugins.json")
+    if not os.path.exists(plugins_path):
+        print("No {}; skipping plugin track.".format(plugins_path))
+        return
+
+    run_plugin_track(load_json(plugins_path), args.plugin_snapshots_dir, args.site_dir)
 
 
 if __name__ == "__main__":
