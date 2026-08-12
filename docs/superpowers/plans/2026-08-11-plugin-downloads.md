@@ -444,7 +444,7 @@ python3 -m venv /tmp/rt-nodeps && /tmp/rt-nodeps/bin/pip install pytest
 /tmp/rt-nodeps/bin/python -m pytest tests/ -v -rs
 ```
 
-Expected: 14 passed, 3 skipped. `tests/test_github_api.py` passes with no matplotlib present; only the `releases.py` regression tests skip.
+Expected: 14 passed, 1 skipped. `tests/test_github_api.py` passes with no matplotlib present; the `releases.py` regression module skips as a single unit. (pytest 9.1+ raises `ModuleNotFoundError` from `importorskip`, so the module-level guard reports one collection-time skip rather than one per test function. All three assertions do run once matplotlib is installed.)
 
 - [ ] **Step 11: Commit**
 
