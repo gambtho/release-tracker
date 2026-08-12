@@ -134,3 +134,5 @@ pytest tests/ -v
 ```
 
 The suite covers plugin attribution from asset filenames, weekly-delta computation (including the guard against decreasing download counts when an asset is re-uploaded), and a regression check that the shared snapshot-diff logic produces byte-identical output for the platform track.
+
+The tests also run in CI on every push to `main` and every pull request, via [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
