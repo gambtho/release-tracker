@@ -49,6 +49,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python plugins.py --json --output-dir _site/ --num-releases 0
+        continue-on-error: true  # Plugin track is independent; must not block the platform deploy
 
       - name: Build site (snapshots + history)
         run: |

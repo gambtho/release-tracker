@@ -97,6 +97,36 @@ def test_decreasing_count_contributes_zero_never_negative():
     assert weekly[("headlamp-k8s/plugins", "flux")] == {"2026-08-10": {"downloads": 0}}
 
 
+def test_multiple_rows_sharing_a_tag_are_summed_not_overwritten():
+    # plugins.py appends one row per asset, and the same plugin can have two
+    # assets under one release tag (e.g. a plugin split into two archives).
+    # build_plugin_index must sum their downloads for that tag, not let the
+    # second row clobber the first.
+    snapshot = {
+        "repos": [
+            {
+                "repo": "headlamp-k8s/plugins",
+                "plugins": [
+                    {
+                        "plugin": "ai-assistant",
+                        "chart": True,
+                        "releases": [
+                            {"tag": "ai-assistant-0.1.0-alpha", "downloads": 100},
+                            {"tag": "ai-assistant-0.1.0-alpha", "downloads": 50},
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+    index = build_site.build_plugin_index(snapshot)
+
+    assert index[("headlamp-k8s/plugins", "ai-assistant")] == {
+        "ai-assistant-0.1.0-alpha": {"downloads": 150}
+    }
+
+
 def test_first_run_with_no_prior_snapshots_produces_empty_weeks(tmp_path):
     site_dir = tmp_path / "site"
     snaps_dir = tmp_path / "plugin-snapshots"

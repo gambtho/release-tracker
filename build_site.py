@@ -91,14 +91,22 @@ def build_platform_index(snapshot_data):
 
 
 def build_plugin_index(snapshot_data):
-    """Index a plugin snapshot as {(repo, plugin): {tag: {metric: count}}}."""
+    """Index a plugin snapshot as {(repo, plugin): {tag: {metric: count}}}.
+
+    Unlike the platform track, a tag is not a unique row key here: plugins.py
+    appends one row per asset, and the same release tag can carry two assets
+    for the same plugin. Sum same-tag rows rather than overwrite, or the
+    earlier row's downloads would silently vanish from the weekly diff.
+    """
     index = {}
     for repo_data in snapshot_data.get("repos", []):
         repo = repo_data["repo"]
         for plugin_data in repo_data.get("plugins", []):
             tags = {}
             for rel in plugin_data.get("releases", []):
-                tags[rel["tag"]] = {m: rel.get(m, 0) for m in PLUGIN_METRICS}
+                counts = tags.setdefault(rel["tag"], {m: 0 for m in PLUGIN_METRICS})
+                for m in PLUGIN_METRICS:
+                    counts[m] += rel.get(m, 0)
             index[(repo, plugin_data["plugin"])] = tags
     return index
 
