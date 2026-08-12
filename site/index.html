@@ -3,217 +3,628 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GitHub Release Downloads Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Daily download counts for GitHub release assets, by platform and by plugin.">
+<meta name="theme-color" content="#f4f5f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1f26" media="(prefers-color-scheme: dark)">
+<title>Release Downloads</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='3' height='7' x='1' y='8' rx='1' fill='%23c97a15'/%3E%3Crect width='3' height='11' x='6' y='4' rx='1' fill='%2335619e'/%3E%3Crect width='3' height='14' x='11' y='1' rx='1' fill='%236b2f72'/%3E%3C/svg%3E">
+<script
+  src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
+  integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ"
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"></script>
 <style>
+  /* ---- Tokens -------------------------------------------------------- */
+  :root {
+    /* Neutrals are tinted toward the data hue (250) rather than pure gray. */
+    --bg: oklch(0.975 0.004 250);
+    --surface: oklch(0.995 0.002 250);
+    --surface-sunken: oklch(0.955 0.006 250);
+    --border: oklch(0.90 0.008 250);
+    --border-strong: oklch(0.80 0.012 250);
+    --text: oklch(0.30 0.02 255);
+    --text-muted: oklch(0.52 0.018 255);
+    --accent: oklch(0.52 0.14 250);
+    --accent-weak: oklch(0.95 0.03 250);
+    --focus: oklch(0.58 0.17 250);
+    --danger: oklch(0.50 0.18 25);
+    --danger-weak: oklch(0.96 0.03 25);
+
+    /* Series colors are separated by LIGHTNESS (0.66 / 0.55 / 0.42) so they
+       stay distinguishable in grayscale and under red-green color blindness.
+       Amber is held at 0.66 rather than lighter so it clears 3:1 against the
+       card surface, the WCAG minimum for a non-text element carrying meaning. */
+    --c-linux: oklch(0.66 0.145 52);
+    --c-mac: oklch(0.55 0.13 245);
+    --c-win: oklch(0.42 0.14 320);
+    --c-plugin: oklch(0.55 0.11 195);
+    --grid: oklch(0.92 0.006 250);
+    --axis: oklch(0.50 0.018 255);
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+
+    /* 1.2 ratio; product UI wants a tight, fixed scale. */
+    --text-2xs: 0.6875rem;
+    --text-xs: 0.8125rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-md: 1.125rem;
+    --text-lg: 1.375rem;
+    --text-xl: 1.75rem;
+
+    --radius: 10px;
+    --radius-sm: 6px;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: oklch(0.19 0.012 255);
+      --surface: oklch(0.235 0.014 255);
+      --surface-sunken: oklch(0.165 0.012 255);
+      --border: oklch(0.32 0.016 255);
+      --border-strong: oklch(0.44 0.02 255);
+      --text: oklch(0.94 0.008 255);
+      --text-muted: oklch(0.73 0.015 255);
+      --accent: oklch(0.78 0.11 250);
+      --accent-weak: oklch(0.30 0.05 250);
+      --focus: oklch(0.72 0.14 250);
+      --danger: oklch(0.72 0.15 25);
+      --danger-weak: oklch(0.28 0.06 25);
+
+      --c-linux: oklch(0.78 0.15 60);
+      --c-mac: oklch(0.66 0.13 250);
+      --c-win: oklch(0.60 0.15 320);
+      --c-plugin: oklch(0.70 0.11 195);
+      --grid: oklch(0.30 0.014 255);
+      --axis: oklch(0.71 0.015 255);
+    }
+  }
+
+  /* ---- Base ---------------------------------------------------------- */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    background: #0d1117;
-    color: #e6edf3;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Liberation Sans', sans-serif;
+    font-size: var(--text-base);
     line-height: 1.5;
-    padding: 2rem;
+    -webkit-text-size-adjust: 100%;
   }
-  .header {
-    text-align: center;
-    margin-bottom: 2.5rem;
+
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-5) var(--space-7);
   }
-  .header h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
+
+  a { color: var(--accent); }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
   }
-  .header .updated {
-    color: #8b949e;
-    font-size: 0.85rem;
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
-  .card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    margin: 0 auto 2rem auto;
-    max-width: 1100px;
-  }
-  .card-header {
+
+  /* ---- Masthead ------------------------------------------------------ */
+  .masthead {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-5);
+    margin-bottom: var(--space-5);
   }
-  .card-header h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
+
+  .masthead h1 {
+    font-size: var(--text-xl);
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
   }
-  .card-header h2 a {
-    color: #58a6ff;
-    text-decoration: none;
+
+  .masthead .subtitle {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    max-width: 60ch;
+    margin-top: var(--space-1);
   }
-  .card-header h2 a:hover {
-    text-decoration: underline;
+
+  .updated {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
   }
-  .stat {
-    font-size: 1.1rem;
-    color: #8b949e;
+
+  /* Summary strip: real aggregates, not decoration. */
+  .summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    padding: var(--space-4) 0 var(--space-5);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-6);
   }
-  .stat strong {
-    color: #e6edf3;
-    font-size: 1.35rem;
-  }
-  .chart-container {
-    position: relative;
-    width: 100%;
-    margin-bottom: 1.5rem;
-  }
-  .chart-label {
-    font-size: 0.8rem;
-    color: #8b949e;
+
+  /* `display: flex` would otherwise beat the `hidden` attribute. */
+  .summary[hidden] { display: none; }
+
+  .summary-item dt {
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+    font-weight: 550;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.5rem;
+    letter-spacing: 0.07em;
   }
+
+  .summary-item dd {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+
+  .summary-item .qualifier {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  /* ---- Cards --------------------------------------------------------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-5);
+  }
+
+  .card + .card { margin-top: var(--space-5); }
+
+  .card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .card-head h2 {
+    font-size: var(--text-md);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .card-head h2 a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 160ms var(--ease-out), color 160ms var(--ease-out);
+  }
+
+  .card-head h2 a:hover {
+    color: var(--accent);
+    border-bottom-color: currentColor;
+  }
+
+  .card-head .plugin-name {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .metric { text-align: right; }
+
+  .metric-label {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+    font-weight: 550;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  .metric-value {
+    font-size: var(--text-md);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Controls sit close to the chart they drive, away from the title above. */
+  .card-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-2);
+  }
+
   .toggle-bar {
     display: inline-flex;
-    background: #0d1117;
-    border: 1px solid #30363d;
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 0.75rem;
+    background: var(--surface-sunken);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    gap: 2px;
   }
+
   .toggle-btn {
-    padding: 0.35rem 1rem;
-    font-size: 0.8rem;
+    padding: 0.4rem 0.85rem;
+    min-height: 34px;
+    font-size: var(--text-xs);
     font-family: inherit;
-    color: #8b949e;
+    font-weight: 500;
+    color: var(--text-muted);
     background: transparent;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background 160ms var(--ease-out), color 160ms var(--ease-out);
   }
-  .toggle-btn:hover {
-    color: #e6edf3;
+
+  .toggle-btn:hover { color: var(--text); }
+
+  .toggle-btn[aria-pressed="true"] {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px oklch(0 0 0 / 0.10);
   }
-  .toggle-btn.active {
-    background: #30363d;
-    color: #e6edf3;
+
+  @media (prefers-color-scheme: dark) {
+    .toggle-btn[aria-pressed="true"] { box-shadow: none; background: var(--border); }
   }
-  .loading {
+
+  .pre-note {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .pre-note[hidden] { display: none; }
+
+  .chart-note {
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+    margin-top: var(--space-2);
+  }
+
+  .chart-note[hidden] { display: none; }
+
+  .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background-color: var(--swatch-color, var(--c-linux));
+    background-image: repeating-linear-gradient(
+      45deg, transparent 0 3px, var(--surface) 3px 5px);
+  }
+
+  /* ---- Charts -------------------------------------------------------- */
+  /* Height is set per view in JS: the release view is a horizontal bar list
+     whose height grows with the number of releases; the time-series views
+     keep a fixed height and let Chart.js thin out the date labels. */
+  .chart-holder {
+    position: relative;
+    height: 340px;
+  }
+
+  /* ---- Loading / empty / error --------------------------------------- */
+  .skeleton-card { border-color: var(--border); }
+
+  .skeleton {
+    background: var(--surface-sunken);
+    border-radius: var(--radius-sm);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  .skeleton--title { width: 14rem; height: 1.25rem; }
+  .skeleton--chart { height: 340px; margin-top: var(--space-5); }
+
+  @keyframes pulse { 50% { opacity: 0.55; } }
+
+  .notice {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: var(--space-6) var(--space-5);
     text-align: center;
-    color: #8b949e;
-    padding: 4rem 0;
-    font-size: 1rem;
   }
-  .error {
-    text-align: center;
-    color: #f85149;
-    padding: 4rem 0;
+
+  .notice h2 {
+    font-size: var(--text-md);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+  }
+
+  .notice p {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    max-width: 52ch;
+    margin: 0 auto;
+  }
+
+  .notice--error {
+    border-color: var(--danger);
+    background: var(--danger-weak);
+  }
+
+  .notice--error h2 { color: var(--danger); }
+
+  .retry {
+    margin-top: var(--space-4);
+    padding: 0.5rem 1rem;
+    min-height: 40px;
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 550;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 160ms var(--ease-out);
+  }
+
+  .retry:hover:not(:disabled) { background: var(--surface-sunken); }
+
+  .retry:disabled {
+    color: var(--text-muted);
+    cursor: default;
+  }
+
+  /* ---- Footer -------------------------------------------------------- */
+  .page-footer {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    max-width: 72ch;
+  }
+
+  .page-footer p + p { margin-top: var(--space-2); }
+
+  /* ---- Responsive ---------------------------------------------------- */
+  @media (max-width: 640px) {
+    .page { padding: var(--space-5) var(--space-4) var(--space-6); }
+    .card { padding: var(--space-4); }
+    .masthead h1 { font-size: var(--text-lg); }
+    .summary { gap: var(--space-3) var(--space-5); }
+    .metric { text-align: left; }
+    .skeleton--chart { height: 260px; }
+    .toggle-bar { width: 100%; }
+    .toggle-btn { flex: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>GitHub Release Downloads</h1>
-  <div class="updated" id="updated"></div>
-</div>
-<div id="content">
-  <div class="loading">Loading data&hellip;</div>
+<div class="page">
+
+<header class="masthead">
+  <div>
+    <h1>Release downloads</h1>
+    <p class="subtitle">Download counts for GitHub release assets, snapshotted daily and split by platform.</p>
+  </div>
+  <p class="updated" id="updated"></p>
+</header>
+
+<dl class="summary" id="summary" hidden></dl>
+
+<main id="content">
+  <div class="card skeleton-card" aria-hidden="true">
+    <div class="skeleton skeleton--title"></div>
+    <div class="skeleton skeleton--chart"></div>
+  </div>
+  <p class="visually-hidden" role="status">Loading download data.</p>
+</main>
+
+<footer class="page-footer">
+  <p>Totals marked &ldquo;&asymp;&rdquo; are approximate: GitHub reports a cumulative counter per release asset, which can reset when an asset is re-uploaded, so all-time figures are a floor rather than an exact count.</p>
+  <p>Weekly and monthly figures are differences between daily snapshots, not values reported by GitHub. A week only appears once two snapshots bracket it.</p>
+</footer>
+
 </div>
 
 <script>
-const COLORS = {
-  linux: { bg: '#F5A623', bgFaded: 'rgba(245,166,35,0.45)' },
-  mac:   { bg: '#4A90D9', bgFaded: 'rgba(74,144,217,0.45)' },
-  win:   { bg: '#7ED321', bgFaded: 'rgba(126,211,33,0.45)' },
-  plugin:{ bg: '#BC7EE8', bgFaded: 'rgba(188,126,232,0.45)' },
+/* ---------- Theme-aware chart colors ---------------------------------- */
+
+// Older browsers can't parse oklch() in a canvas fillStyle. Detect once and
+// fall back to hex approximations rather than silently painting everything black.
+const SUPPORTS_OKLCH = (function () {
+  const ctx = document.createElement('canvas').getContext('2d');
+  if (!ctx) return false;
+  ctx.fillStyle = '#000000';
+  ctx.fillStyle = 'oklch(0.72 0.15 55)';
+  return ctx.fillStyle !== '#000000';
+})();
+
+const FALLBACK_COLORS = {
+  light: { linux: '#c97a15', mac: '#35619e', win: '#6b2f72', plugin: '#2c7f80',
+           grid: '#e6e8ee', axis: '#6b7280', text: '#3a3f4b',
+           surface: '#fdfdff', border: '#d9dce4' },
+  dark:  { linux: '#e8a24a', mac: '#6e9bd6', win: '#b274b8', plugin: '#57b3b2',
+           grid: '#3b4048', axis: '#a8adb8', text: '#e9eaee',
+           surface: '#31353d', border: '#454b55' },
 };
 
-const CHART_DEFAULTS = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      labels: { color: '#8b949e', padding: 16, usePointStyle: true, pointStyle: 'rectRounded' }
-    },
-    tooltip: {
-      backgroundColor: '#1c2128',
-      titleColor: '#e6edf3',
-      bodyColor: '#e6edf3',
-      borderColor: '#30363d',
-      borderWidth: 1,
-      padding: 10,
-      callbacks: {
-        footer: function(items) {
-          let sum = 0;
-          items.forEach(i => sum += i.parsed.y);
-          return 'Total: ' + sum.toLocaleString();
-        }
-      }
-    }
-  },
-  scales: {
-    x: {
-      stacked: true,
-      ticks: { color: '#8b949e', maxRotation: 45 },
-      grid: { color: 'rgba(48,54,61,0.5)' },
-    },
-    y: {
-      stacked: true,
-      ticks: { color: '#8b949e', callback: v => v.toLocaleString() },
-      grid: { color: 'rgba(48,54,61,0.5)' },
-    }
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+function theme() {
+  if (SUPPORTS_OKLCH) {
+    const s = getComputedStyle(document.documentElement);
+    const v = name => s.getPropertyValue(name).trim();
+    return {
+      linux: v('--c-linux'), mac: v('--c-mac'), win: v('--c-win'), plugin: v('--c-plugin'),
+      grid: v('--grid'), axis: v('--axis'), text: v('--text'),
+      surface: v('--surface'), border: v('--border'),
+    };
   }
-};
+  return prefersDark.matches ? FALLBACK_COLORS.dark : FALLBACK_COLORS.light;
+}
 
-function fmt(n) { return Number(n).toLocaleString(); }
+// Prereleases keep full color and are marked with a hatch instead of being
+// faded out. A faded fill read as a separate category; a hatch reads as
+// "same series, different status" and survives grayscale printing.
+const patternCache = new Map();
 
-function buildReleaseChartConfig(repoData) {
-  const releases = repoData.releases;
-  const labels = releases.map(r => r.prerelease ? r.tag + ' (pre)' : r.tag);
-
-  function colorArr(base, faded) {
-    return releases.map(r => r.prerelease ? faded : base);
+function hatch(color, surface) {
+  const key = color + '|' + surface;
+  if (patternCache.has(key)) return patternCache.get(key);
+  const tile = document.createElement('canvas');
+  tile.width = tile.height = 8;
+  const ctx = tile.getContext('2d');
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, 8, 8);
+  ctx.strokeStyle = surface;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = -8; i <= 16; i += 4) {
+    ctx.moveTo(i, -1);
+    ctx.lineTo(i + 9, 8);
   }
+  ctx.stroke();
+  const pattern = ctx.createPattern(tile, 'repeat') || color;
+  patternCache.set(key, pattern);
+  return pattern;
+}
 
+function chartDefaults(multiSeries, horizontal) {
+  const t = theme();
+  const valueTicks = { color: t.axis, callback: v => v.toLocaleString(), font: { size: 11 } };
+  const categoryTicks = { color: t.axis, font: { size: 11 }, autoSkip: !horizontal, maxRotation: 0 };
   return {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Linux', data: releases.map(r => r.linux),  backgroundColor: colorArr(COLORS.linux.bg, COLORS.linux.bgFaded) },
-        { label: 'Mac',   data: releases.map(r => r.mac),    backgroundColor: colorArr(COLORS.mac.bg, COLORS.mac.bgFaded) },
-        { label: 'Win',   data: releases.map(r => r.win),    backgroundColor: colorArr(COLORS.win.bg, COLORS.win.bgFaded) },
-      ]
+    indexAxis: horizontal ? 'y' : 'x',
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: prefersReducedMotion.matches ? false : { duration: 220, easing: 'easeOutQuart' },
+    plugins: {
+      // A one-series chart needs no legend and no "total" restating the bar.
+      legend: multiSeries
+        ? { labels: { color: t.axis, padding: 16, boxWidth: 12, boxHeight: 12, usePointStyle: true, pointStyle: 'rectRounded' } }
+        : { display: false },
+      tooltip: {
+        backgroundColor: t.surface,
+        titleColor: t.text,
+        bodyColor: t.text,
+        footerColor: t.text,
+        borderColor: t.border,
+        borderWidth: 1,
+        padding: 10,
+        displayColors: multiSeries,
+        callbacks: multiSeries ? {
+          footer: function (items) {
+            let sum = 0;
+            items.forEach(i => sum += (horizontal ? i.parsed.x : i.parsed.y));
+            return 'Total: ' + sum.toLocaleString();
+          }
+        } : {},
+      }
     },
-    options: {
-      ...CHART_DEFAULTS,
-      scales: {
-        ...CHART_DEFAULTS.scales,
-        x: { ...CHART_DEFAULTS.scales.x, ticks: { ...CHART_DEFAULTS.scales.x.ticks, font: { size: releases.length > 30 ? 9 : 11 } } }
+    scales: {
+      x: {
+        stacked: true,
+        // On a tall horizontal chart the scale belongs at the top, where the
+        // reader arrives, not 1,000px below at the end of the list.
+        position: horizontal ? 'top' : 'bottom',
+        ticks: horizontal ? valueTicks : categoryTicks,
+        grid: horizontal ? { color: t.grid } : { display: false },
+        border: { color: t.border, display: !horizontal },
+      },
+      y: {
+        stacked: true,
+        ticks: horizontal ? categoryTicks : valueTicks,
+        grid: horizontal ? { display: false } : { color: t.grid },
+        border: { color: t.border, display: horizontal },
       }
     }
   };
 }
 
-function buildWeeklyChartConfig(weeklyData) {
-  const weeks = weeklyData.weeks;
-  const labels = weeks.map(w => {
-    const d = new Date(w.week + 'T00:00:00');
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  });
+function fmt(n) { return Number(n).toLocaleString(); }
+
+function monthLabel(ym) {
+  const d = new Date(ym + '-01T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
+function weekLabel(week) {
+  const d = new Date(week + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+/* ---------- Platform charts ------------------------------------------- */
+
+function buildReleaseChartConfig(repoData) {
+  const t = theme();
+  const releases = trimReleases(repoData.releases);
+  const labels = releases.map(r => r.prerelease ? r.tag + ' (pre)' : r.tag);
+
+  function fill(color) {
+    return releases.map(r => r.prerelease ? hatch(color, t.surface) : color);
+  }
 
   return {
     type: 'bar',
     data: {
       labels,
       datasets: [
-        { label: 'Linux', data: weeks.map(w => w.linux), backgroundColor: COLORS.linux.bg },
-        { label: 'Mac',   data: weeks.map(w => w.mac),   backgroundColor: COLORS.mac.bg },
-        { label: 'Win',   data: weeks.map(w => w.win),   backgroundColor: COLORS.win.bg },
+        { label: 'Linux', data: releases.map(r => r.linux), backgroundColor: fill(t.linux) },
+        { label: 'Mac', data: releases.map(r => r.mac), backgroundColor: fill(t.mac) },
+        { label: 'Win', data: releases.map(r => r.win), backgroundColor: fill(t.win) },
       ]
     },
-    options: CHART_DEFAULTS
+    // Horizontal: a release list is a catalog of named items, and bar count
+    // should drive height (readable labels) rather than squeeze the width.
+    options: chartDefaults(true, true)
+  };
+}
+
+function buildWeeklyChartConfig(weeklyData) {
+  const t = theme();
+  const weeks = weeklyData.weeks;
+  return {
+    type: 'bar',
+    data: {
+      labels: weeks.map(w => weekLabel(w.week)),
+      datasets: [
+        { label: 'Linux', data: weeks.map(w => w.linux), backgroundColor: t.linux },
+        { label: 'Mac', data: weeks.map(w => w.mac), backgroundColor: t.mac },
+        { label: 'Win', data: weeks.map(w => w.win), backgroundColor: t.win },
+      ]
+    },
+    options: chartDefaults(true, false)
   };
 }
 
@@ -232,51 +643,27 @@ function aggregateMonthly(weeklyData) {
 }
 
 function buildMonthlyChartConfig(weeklyData) {
+  const t = theme();
   const months = aggregateMonthly(weeklyData);
-  const labels = months.map(m => {
-    const d = new Date(m.month + '-01T00:00:00');
-    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  });
-
   return {
     type: 'bar',
     data: {
-      labels,
+      labels: months.map(m => monthLabel(m.month)),
       datasets: [
-        { label: 'Linux', data: months.map(m => m.linux), backgroundColor: COLORS.linux.bg },
-        { label: 'Mac',   data: months.map(m => m.mac),   backgroundColor: COLORS.mac.bg },
-        { label: 'Win',   data: months.map(m => m.win),   backgroundColor: COLORS.win.bg },
+        { label: 'Linux', data: months.map(m => m.linux), backgroundColor: t.linux },
+        { label: 'Mac', data: months.map(m => m.mac), backgroundColor: t.mac },
+        { label: 'Win', data: months.map(m => m.win), backgroundColor: t.win },
       ]
     },
-    options: CHART_DEFAULTS
+    options: chartDefaults(true, false)
   };
 }
 
-function setupToggle(chartId, builders, hasWeekly) {
-  const canvas = document.getElementById(chartId);
-  if (!canvas) return;
-
-  const initialView = hasWeekly ? 'weekly' : 'release';
-  let chart = new Chart(canvas, builders[initialView]());
-
-  const container = canvas.closest('.chart-container');
-  if (!container) return;
-  const buttons = container.querySelectorAll('[data-view]');
-
-  buttons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const view = btn.getAttribute('data-view');
-      if (!builders[view]) return;
-      buttons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      chart.destroy();
-      chart = new Chart(canvas, builders[view]());
-    });
-  });
-}
+/* ---------- Plugin charts --------------------------------------------- */
 
 function buildPluginReleaseChartConfig(pluginData) {
-  const releases = pluginData.releases;
+  const t = theme();
+  const releases = trimReleases(pluginData.releases);
 
   // A version can repeat within one plugin (legacy version-only tags bundled
   // several plugins into one release, e.g. app-catalog 0.1.3 under both
@@ -300,36 +687,26 @@ function buildPluginReleaseChartConfig(pluginData) {
         {
           label: 'Downloads',
           data: releases.map(r => r.downloads),
-          backgroundColor: releases.map(r => r.prerelease ? COLORS.plugin.bgFaded : COLORS.plugin.bg)
+          backgroundColor: releases.map(r => r.prerelease ? hatch(t.plugin, t.surface) : t.plugin)
         }
       ]
     },
-    options: {
-      ...CHART_DEFAULTS,
-      scales: {
-        ...CHART_DEFAULTS.scales,
-        x: { ...CHART_DEFAULTS.scales.x, ticks: { ...CHART_DEFAULTS.scales.x.ticks, font: { size: releases.length > 30 ? 9 : 11 } } }
-      }
-    }
+    options: chartDefaults(false, true)
   };
 }
 
 function buildPluginWeeklyChartConfig(weeklyData) {
+  const t = theme();
   const weeks = weeklyData.weeks;
-  const labels = weeks.map(w => {
-    const d = new Date(w.week + 'T00:00:00');
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  });
-
   return {
     type: 'bar',
     data: {
-      labels,
+      labels: weeks.map(w => weekLabel(w.week)),
       datasets: [
-        { label: 'Downloads', data: weeks.map(w => w.downloads), backgroundColor: COLORS.plugin.bg }
+        { label: 'Downloads', data: weeks.map(w => w.downloads), backgroundColor: t.plugin }
       ]
     },
-    options: CHART_DEFAULTS
+    options: chartDefaults(false, false)
   };
 }
 
@@ -346,22 +723,117 @@ function aggregatePluginMonthly(weeklyData) {
 }
 
 function buildPluginMonthlyChartConfig(weeklyData) {
+  const t = theme();
   const months = aggregatePluginMonthly(weeklyData);
-  const labels = months.map(m => {
-    const d = new Date(m.month + '-01T00:00:00');
-    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  });
-
   return {
     type: 'bar',
     data: {
-      labels,
+      labels: months.map(m => monthLabel(m.month)),
       datasets: [
-        { label: 'Downloads', data: months.map(m => m.downloads), backgroundColor: COLORS.plugin.bg }
+        { label: 'Downloads', data: months.map(m => m.downloads), backgroundColor: t.plugin }
       ]
     },
-    options: CHART_DEFAULTS
+    options: chartDefaults(false, false)
   };
+}
+
+/* ---------- Chart mounting -------------------------------------------- */
+
+const TIME_SERIES_HEIGHT = 340;
+const MOBILE_TIME_SERIES_HEIGHT = 260;
+const PX_PER_RELEASE = 24;
+
+// One row per release is only viable while the canvas stays inside the
+// browser's limits. Those limits are on device pixels, so a phone at DPR 3
+// hits them three times sooner: an unbounded list would render blank rather
+// than merely long. The release view therefore shows the most recent
+// MAX_RELEASE_ROWS and says so; MAX_CHART_HEIGHT is a second line of defence.
+const MAX_RELEASE_ROWS = 60;
+const MAX_CHART_HEIGHT = 2000;
+
+const mounted = [];
+
+function trimReleases(releases) {
+  return releases.length > MAX_RELEASE_ROWS ? releases.slice(-MAX_RELEASE_ROWS) : releases;
+}
+
+function chartHeight(spec) {
+  if (!spec.horizontal) {
+    return window.innerWidth <= 640 ? MOBILE_TIME_SERIES_HEIGHT : TIME_SERIES_HEIGHT;
+  }
+  // Horizontal bars: one row per release, plus room for the legend and axis.
+  return Math.min(MAX_CHART_HEIGHT, Math.max(240, spec.bars * PX_PER_RELEASE + 60));
+}
+
+function renderView(state, view) {
+  const spec = state.views[view];
+  if (!spec) return;
+  state.view = view;
+
+  state.holder.style.height = chartHeight(spec) + 'px';
+
+  if (state.chart) state.chart.destroy();
+  state.chart = new Chart(state.canvas, spec.build());
+  state.canvas.setAttribute('aria-label', spec.label);
+
+  state.preNote.hidden = view !== 'release' || !spec.hasPrerelease;
+
+  // Never truncate silently: a chart that quietly drops rows reads as complete.
+  const dropped = view === 'release' ? (spec.hidden || 0) : 0;
+  state.note.hidden = dropped === 0;
+  if (dropped > 0) {
+    state.note.textContent = 'Showing the ' + spec.bars + ' most recent of '
+      + spec.total + ' releases. The all-time total above covers all of them.';
+  }
+
+  state.buttons.forEach(b => {
+    b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === view));
+  });
+}
+
+function mountChart(card, chartId, views, initialView) {
+  const canvas = card.querySelector('canvas');
+  if (!canvas) return;
+
+  const state = {
+    canvas,
+    holder: card.querySelector('.chart-holder'),
+    preNote: card.querySelector('.pre-note'),
+    note: card.querySelector('.chart-note'),
+    buttons: Array.from(card.querySelectorAll('[data-view]')),
+    views,
+    chart: null,
+    view: initialView,
+  };
+
+  state.buttons.forEach(btn => {
+    btn.addEventListener('click', () => renderView(state, btn.getAttribute('data-view')));
+  });
+
+  renderView(state, initialView);
+  mounted.push(state);
+}
+
+function rerenderAll() {
+  patternCache.clear();
+  mounted.forEach(state => renderView(state, state.view));
+}
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(rerenderAll, 150);
+});
+
+// Charts are painted into a canvas, so they can't inherit a CSS theme change.
+prefersDark.addEventListener('change', rerenderAll);
+
+/* ---------- Markup ----------------------------------------------------- */
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
 }
 
 function pluginChartId(repo, plugin) {
@@ -372,72 +844,163 @@ function pluginChartId(repo, plugin) {
   return 'chart-plugin-' + safe(repo) + '_' + safe(plugin);
 }
 
-function buildPluginCard(repo, pluginData, weeklyData) {
-  const card = document.createElement('div');
-  card.className = 'card';
-
-  const repoUrl = 'https://github.com/' + repo;
-  const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
-  const chartId = pluginChartId(repo, pluginData.plugin);
-
-  let html = '<div class="card-header">'
-    + '<h2><a href="' + repoUrl + '" target="_blank">' + repo + '</a> &mdash; ' + pluginData.plugin + '</h2>'
-    + '<div class="stat">Total Downloads: <strong>' + fmt(pluginData.approx_all_time_downloads) + '</strong></div>'
-    + '</div>';
-
-  html += '<div class="chart-container">';
-
-  html += '<div class="toggle-bar">'
-    + '<button class="toggle-btn' + (hasWeekly ? '' : ' active') + '" data-view="release">By Release</button>';
-  if (hasWeekly) {
-    html += '<button class="toggle-btn active" data-view="weekly">By Week</button>'
-      + '<button class="toggle-btn" data-view="monthly">By Month</button>';
-  }
-  html += '</div>';
-
-  html += '<div style="position:relative;height:' + Math.max(300, pluginData.releases.length * 8) + 'px">'
-    + '<canvas id="' + chartId + '"></canvas>'
-    + '</div></div>';
-
-  card.innerHTML = html;
-  return card;
+function chartBlock(chartId, hasWeekly, swatchVar) {
+  return '<div class="card-controls">'
+    + '<div class="toggle-bar" role="group" aria-label="Chart view">'
+    + '<button type="button" class="toggle-btn" data-view="release" aria-pressed="false">By release</button>'
+    + (hasWeekly
+      ? '<button type="button" class="toggle-btn" data-view="weekly" aria-pressed="false">By week</button>'
+        + '<button type="button" class="toggle-btn" data-view="monthly" aria-pressed="false">By month</button>'
+      : '')
+    + '</div>'
+    + '<p class="pre-note" hidden style="--swatch-color: var(' + swatchVar + ')">'
+    + '<span class="swatch" aria-hidden="true"></span>Hatched bars are prereleases</p>'
+    + '</div>'
+    + '<div class="chart-holder">'
+    + '<canvas id="' + chartId + '" role="img"></canvas>'
+    + '</div>'
+    + '<p class="chart-note" hidden></p>';
 }
 
 function buildCard(repoData, weeklyData) {
-  const card = document.createElement('div');
+  const card = document.createElement('article');
   card.className = 'card';
 
-  const repoUrl = 'https://github.com/' + repoData.repo;
+  const repo = repoData.repo;
   const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
-  const chartId = 'chart-' + repoData.repo.replace(/\//g, '-');
+  const chartId = 'chart-' + repo.replace(/\//g, '-');
 
-  let html = '<div class="card-header">'
-    + '<h2><a href="' + repoUrl + '" target="_blank">' + repoData.repo + '</a></h2>'
-    + '<div class="stat">Total Downloads: <strong>' + fmt(repoData.approx_all_time_release_downloads) + '</strong></div>'
-    + '</div>';
+  card.innerHTML = '<div class="card-head">'
+    + '<h2><a href="https://github.com/' + esc(repo) + '" target="_blank" rel="noopener noreferrer">'
+    + esc(repo) + '</a></h2>'
+    + '<p class="metric"><span class="metric-label">All-time</span>'
+    + '<span class="metric-value">&asymp;&nbsp;' + fmt(repoData.approx_all_time_release_downloads) + '</span></p>'
+    + '</div>'
+    + chartBlock(chartId, hasWeekly, '--c-linux');
 
-  // Single chart area with toggle
-  html += '<div class="chart-container">';
-
-  // Toggle buttons
-  html += '<div class="toggle-bar">'
-    + '<button class="toggle-btn' + (hasWeekly ? '' : ' active') + '" data-view="release">By Release</button>';
-  if (hasWeekly) {
-    html += '<button class="toggle-btn active" data-view="weekly">By Week</button>'
-      + '<button class="toggle-btn" data-view="monthly">By Month</button>';
-  }
-  html += '</div>';
-
-  html += '<div style="position:relative;height:' + Math.max(300, repoData.releases.length * 8) + 'px">'
-    + '<canvas id="' + chartId + '"></canvas>'
-    + '</div></div>';
-
-  card.innerHTML = html;
-  return card;
+  return { card, chartId, hasWeekly };
 }
 
+function buildPluginCard(repo, pluginData, weeklyData) {
+  const card = document.createElement('article');
+  card.className = 'card';
+
+  const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
+  const chartId = pluginChartId(repo, pluginData.plugin);
+
+  card.innerHTML = '<div class="card-head">'
+    + '<h2><a href="https://github.com/' + esc(repo) + '" target="_blank" rel="noopener noreferrer">'
+    + esc(repo) + '</a> <span class="plugin-name">' + esc(pluginData.plugin) + '</span></h2>'
+    + '<p class="metric"><span class="metric-label">All-time</span>'
+    + '<span class="metric-value">&asymp;&nbsp;' + fmt(pluginData.approx_all_time_downloads) + '</span></p>'
+    + '</div>'
+    + chartBlock(chartId, hasWeekly, '--c-plugin');
+
+  return { card, chartId, hasWeekly };
+}
+
+function hasPrerelease(releases) {
+  return releases.some(r => r.prerelease);
+}
+
+/* ---------- Summary ---------------------------------------------------- */
+
+function renderSummary(data, history, plugins) {
+  const el = document.getElementById('summary');
+  const items = [];
+  const repos = data.repos || [];
+
+  const repoTotal = repos.reduce(
+    (sum, r) => sum + (r.approx_all_time_release_downloads || 0), 0);
+
+  const charted = [];
+  for (const repo of (plugins.repos || [])) {
+    for (const p of (repo.plugins || [])) {
+      if (p.chart) charted.push(p);
+    }
+  }
+  const pluginTotal = charted.reduce((sum, p) => sum + (p.approx_all_time_downloads || 0), 0);
+
+  items.push({
+    label: 'Release downloads',
+    value: '&asymp;&nbsp;' + fmt(repoTotal),
+    qualifier: repos.length + (repos.length === 1 ? ' repo' : ' repos'),
+  });
+
+  if (charted.length) {
+    items.push({
+      label: 'Plugin downloads',
+      value: '&asymp;&nbsp;' + fmt(pluginTotal),
+      qualifier: charted.length + (charted.length === 1 ? ' plugin' : ' plugins'),
+    });
+  }
+
+  // Newest week that EVERY repo with history has a figure for. Taking the
+  // newest week seen anywhere would silently understate the total: a repo
+  // added last week has no entry yet, so it would contribute zero under a
+  // label claiming to cover everything. Repos with no history at all are
+  // excluded rather than suppressing the stat entirely.
+  const withHistory = (history.repos || []).filter(r => (r.weeks || []).length);
+  let latestWeek = null;
+  for (const repo of withHistory) {
+    const last = repo.weeks[repo.weeks.length - 1].week;
+    if (latestWeek === null || last < latestWeek) latestWeek = last;
+  }
+  if (latestWeek) {
+    let weekTotal = 0;
+    for (const repo of withHistory) {
+      const entry = repo.weeks.find(w => w.week === latestWeek);
+      if (entry) weekTotal += entry.linux + entry.mac + entry.win;
+    }
+    items.push({
+      label: 'Week of ' + weekLabel(latestWeek),
+      value: fmt(weekTotal),
+      qualifier: 'release downloads',
+    });
+  }
+
+  el.innerHTML = items.map(i =>
+    '<div class="summary-item"><dt>' + i.label + '</dt>'
+    + '<dd>' + i.value + ' <span class="qualifier">' + i.qualifier + '</span></dd></div>'
+  ).join('');
+  el.hidden = false;
+}
+
+/* ---------- Init -------------------------------------------------------- */
+
+function showNotice(content, isError) {
+  const el = document.createElement('div');
+  el.className = 'notice' + (isError ? ' notice--error' : '');
+  el.innerHTML = content;
+  return el;
+}
+
+// init() clears and repopulates #content, so two overlapping runs would
+// interleave their teardown and append steps and duplicate the cards. The
+// retry button makes that reachable with a double click.
+let initRunning = false;
+
 async function init() {
+  if (initRunning) return;
+  initRunning = true;
+  try {
+    await load();
+  } finally {
+    initRunning = false;
+  }
+}
+
+async function load() {
   const content = document.getElementById('content');
+
+  if (typeof Chart === 'undefined') {
+    content.innerHTML = '';
+    content.appendChild(showNotice(
+      '<h2>Charts could not load</h2><p>The charting library was blocked or failed to '
+      + 'download. Check your network or content blocker, then reload.</p>', true));
+    return;
+  }
+
   try {
     const [dataResp, histResp, pluginResp, pluginHistResp] = await Promise.all([
       fetch('./data.json'),
@@ -446,7 +1009,7 @@ async function init() {
       fetch('./plugins-history.json').catch(() => null)
     ]);
 
-    if (!dataResp.ok) throw new Error('Failed to load data.json');
+    if (!dataResp.ok) throw new Error('data.json returned ' + dataResp.status);
     const data = await dataResp.json();
 
     let history = { repos: [] };
@@ -464,29 +1027,55 @@ async function init() {
       pluginHistory = await pluginHistResp.json();
     }
 
-    // Update header
     if (data.generated_at) {
       const d = new Date(data.generated_at);
-      document.getElementById('updated').textContent = 'Last updated: ' + d.toLocaleDateString('en-US', {
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+      const el = document.getElementById('updated');
+      el.textContent = 'Updated ' + d.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
       });
     }
 
+    // Retry re-runs init(), so tear down any charts from a previous attempt.
+    mounted.forEach(state => state.chart && state.chart.destroy());
+    mounted.length = 0;
     content.innerHTML = '';
+
+    if (!(data.repos || []).length) {
+      content.appendChild(showNotice(
+        '<h2>Nothing tracked yet</h2><p>Add a repository to <code>repos.csv</code> and the '
+        + 'next daily run will publish its download history here.</p>', false));
+      renderSummary(data, history, plugins);
+      return;
+    }
+
+    renderSummary(data, history, plugins);
 
     for (const repoData of data.repos) {
       const weeklyData = history.repos.find(r => r.repo === repoData.repo);
-      const card = buildCard(repoData, weeklyData);
+      const { card, chartId, hasWeekly } = buildCard(repoData, weeklyData);
       content.appendChild(card);
 
-      // Setup toggle and render initial chart
-      const chartId = 'chart-' + repoData.repo.replace(/\//g, '-');
-      const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
-      setupToggle(chartId, {
-        release: () => buildReleaseChartConfig(repoData),
-        weekly:  () => buildWeeklyChartConfig(weeklyData),
-        monthly: () => buildMonthlyChartConfig(weeklyData),
-      }, hasWeekly);
+      mountChart(card, chartId, {
+        release: {
+          build: () => buildReleaseChartConfig(repoData),
+          bars: trimReleases(repoData.releases).length,
+          hidden: repoData.releases.length - trimReleases(repoData.releases).length,
+          total: repoData.releases.length,
+          horizontal: true,
+          hasPrerelease: hasPrerelease(trimReleases(repoData.releases)),
+          label: 'Bar chart: downloads per release for ' + repoData.repo + ', split by platform.',
+        },
+        weekly: hasWeekly ? {
+          build: () => buildWeeklyChartConfig(weeklyData),
+          bars: weeklyData.weeks.length,
+          label: 'Bar chart: weekly downloads for ' + repoData.repo + ', split by platform.',
+        } : null,
+        monthly: hasWeekly ? {
+          build: () => buildMonthlyChartConfig(weeklyData),
+          bars: aggregateMonthly(weeklyData).length,
+          label: 'Bar chart: monthly downloads for ' + repoData.repo + ', split by platform.',
+        } : null,
+      }, hasWeekly ? 'weekly' : 'release');
     }
 
     // Plugin cards render after the platform cards. Failures here must not
@@ -500,14 +1089,32 @@ async function init() {
             ? (histRepo.plugins || []).find(p => p.plugin === pluginData.plugin)
             : null;
           const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
+          const name = pluginRepo.repo + ' ' + pluginData.plugin;
 
-          content.appendChild(buildPluginCard(pluginRepo.repo, pluginData, weeklyData));
+          const { card, chartId } = buildPluginCard(pluginRepo.repo, pluginData, weeklyData);
+          content.appendChild(card);
 
-          setupToggle(pluginChartId(pluginRepo.repo, pluginData.plugin), {
-            release: () => buildPluginReleaseChartConfig(pluginData),
-            weekly:  () => buildPluginWeeklyChartConfig(weeklyData),
-            monthly: () => buildPluginMonthlyChartConfig(weeklyData),
-          }, hasWeekly);
+          mountChart(card, chartId, {
+            release: {
+              build: () => buildPluginReleaseChartConfig(pluginData),
+              bars: trimReleases(pluginData.releases).length,
+              hidden: pluginData.releases.length - trimReleases(pluginData.releases).length,
+              total: pluginData.releases.length,
+              horizontal: true,
+              hasPrerelease: hasPrerelease(trimReleases(pluginData.releases)),
+              label: 'Bar chart: downloads per release for ' + name + '.',
+            },
+            weekly: hasWeekly ? {
+              build: () => buildPluginWeeklyChartConfig(weeklyData),
+              bars: weeklyData.weeks.length,
+              label: 'Bar chart: weekly downloads for ' + name + '.',
+            } : null,
+            monthly: hasWeekly ? {
+              build: () => buildPluginMonthlyChartConfig(weeklyData),
+              bars: aggregatePluginMonthly(weeklyData).length,
+              label: 'Bar chart: monthly downloads for ' + name + '.',
+            } : null,
+          }, hasWeekly ? 'weekly' : 'release');
         }
       }
     } catch (pluginErr) {
@@ -515,7 +1122,20 @@ async function init() {
     }
 
   } catch (err) {
-    content.innerHTML = '<div class="error">Error: ' + err.message + '</div>';
+    content.innerHTML = '';
+    const notice = showNotice(
+      '<h2>Could not load the data</h2><p>' + esc(err.message) + '</p>', true);
+    const retry = document.createElement('button');
+    retry.type = 'button';
+    retry.className = 'retry';
+    retry.textContent = 'Try again';
+    retry.addEventListener('click', () => {
+      retry.disabled = true;
+      retry.textContent = 'Retrying...';
+      init();
+    });
+    notice.appendChild(retry);
+    content.appendChild(notice);
   }
 }
 
