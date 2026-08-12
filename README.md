@@ -51,7 +51,7 @@ To add or remove plugin repos, edit `plugins.csv` and push to `main`. The next w
 
 3. **`build_site.py`** saves a daily snapshot of both tracks and diffs consecutive snapshots to compute weekly download deltas — per repo and platform for the release track, per plugin for the plugin track.
 
-4. **`site/index.html`** is a self-contained dark-themed dashboard that renders the data as interactive Chart.js stacked bar charts -- downloads by release, per week, and per month -- with one card per tracked repo plus one card per plugin flagged for charting.
+4. **`site/index.html`** is a self-contained dashboard that renders the data as interactive Chart.js bar charts -- downloads by release (horizontal bars, one row per release), per week, and per month -- with one card per tracked repo plus one card per plugin flagged for charting. It follows the reader's light/dark system preference and pins Chart.js to an exact version with a Subresource Integrity hash, so bumping the version means updating the `integrity` attribute too.
 
 5. A **GitHub Action** (`.github/workflows/update-site.yml`) runs this pipeline daily and deploys the result to the `gh-pages` branch.
 
