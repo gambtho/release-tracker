@@ -21,7 +21,7 @@ Every task's requirements implicitly include this section.
 - **Download decreases clamp to zero, never negative.** GitHub counts can drop when an asset is re-uploaded. The existing `if d > 0` guard is preserved in the shared diff. (Spec D5)
 - **The existing platform track must not change behavior.** `snapshots/` and `history.json` hold real accumulated user-visible history. Task 4 gates this with a byte-identical golden-fixture regression test.
 - **The plugin track must fail soft.** If `plugins.csv` is missing, `plugins.json` is absent, or the plugin fetch fails, the two existing cards must still render and the platform pipeline must still complete.
-- **No new runtime dependencies.** `plugins.py`, `github_api.py`, and `build_site.py` use the Python standard library only. `pytest` is added as a dev/test dependency; `matplotlib`/`numpy` remain required only by `releases.py`'s local chart path.
+- **No new runtime dependencies.** `plugins.py`, `github_api.py`, and `build_site.py` use the Python standard library only. `pytest` is added to the single existing `requirements.txt` — this repo has no separate dev-requirements file and adding one is out of scope, so CI will install a pytest it never runs. That is accepted, not an oversight. `matplotlib`/`numpy` remain required only by `releases.py`'s local chart path.
 - **No JS tooling.** This repo has no JavaScript test framework and none is to be added. Dashboard changes are verified by running the local pipeline and viewing the page.
 - Python style follows the existing files: `"""docstrings"""`, `.format()` for interpolation, 4-space indent, double quotes.
 
@@ -315,7 +315,7 @@ def fetch_all_releases(owner, repo):
 
 Run: `python3 -m pytest tests/test_github_api.py -v`
 
-Expected: 13 passed. Also confirm the module is matplotlib-free:
+Expected: 14 passed. Also confirm the module is matplotlib-free:
 
 ```bash
 python3 -c "import sys, github_api; assert 'matplotlib' not in sys.modules and 'numpy' not in sys.modules; print('clean')"
@@ -433,7 +433,7 @@ python3 -m pip install matplotlib numpy
 python3 -m pytest tests/ -v
 ```
 
-Expected: 16 passed, 0 skipped. The three regression tests must now actually run — if they still report "skipped", the install did not take and the regression guard has not been exercised.
+Expected: 17 passed, 0 skipped. The three regression tests must now actually run — if they still report "skipped", the install did not take and the regression guard has not been exercised.
 
 - [ ] **Step 10: Verify the suite is dependency-free without matplotlib**
 
@@ -444,7 +444,7 @@ python3 -m venv /tmp/rt-nodeps && /tmp/rt-nodeps/bin/pip install pytest
 /tmp/rt-nodeps/bin/python -m pytest tests/ -v -rs
 ```
 
-Expected: 13 passed, 3 skipped. `tests/test_github_api.py` passes with no matplotlib present; only the `releases.py` regression tests skip.
+Expected: 14 passed, 3 skipped. `tests/test_github_api.py` passes with no matplotlib present; only the `releases.py` regression tests skip.
 
 - [ ] **Step 11: Commit**
 
@@ -682,7 +682,7 @@ python3 -c "import sys, plugins; assert 'matplotlib' not in sys.modules and 'num
 python3 -m pytest tests/ -v
 ```
 
-Expected: `clean`, then the full suite green (31 passed with the chart deps installed).
+Expected: `clean`, then the full suite green (32 passed with the chart deps installed).
 
 - [ ] **Step 7: Commit**
 
