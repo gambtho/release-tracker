@@ -1,0 +1,93 @@
+{
+  "repos": [
+    {
+      "repo": "headlamp-k8s/plugins",
+      "plugins": [
+        {
+          "plugin": "ai-assistant",
+          "weeks": []
+        },
+        {
+          "plugin": "app-catalog",
+          "weeks": []
+        },
+        {
+          "plugin": "argocd",
+          "weeks": []
+        },
+        {
+          "plugin": "backstage",
+          "weeks": []
+        },
+        {
+          "plugin": "cert-manager",
+          "weeks": []
+        },
+        {
+          "plugin": "change-logo",
+          "weeks": []
+        },
+        {
+          "plugin": "cluster-api",
+          "weeks": []
+        },
+        {
+          "plugin": "flux",
+          "weeks": []
+        },
+        {
+          "plugin": "karpenter",
+          "weeks": []
+        },
+        {
+          "plugin": "keda",
+          "weeks": []
+        },
+        {
+          "plugin": "knative",
+          "weeks": []
+        },
+        {
+          "plugin": "kompose",
+          "weeks": []
+        },
+        {
+          "plugin": "kro",
+          "weeks": []
+        },
+        {
+          "plugin": "kubeflow",
+          "weeks": []
+        },
+        {
+          "plugin": "minikube",
+          "weeks": []
+        },
+        {
+          "plugin": "opencost",
+          "weeks": []
+        },
+        {
+          "plugin": "plugin-catalog",
+          "weeks": []
+        },
+        {
+          "plugin": "prometheus",
+          "weeks": []
+        },
+        {
+          "plugin": "radius",
+          "weeks": []
+        },
+        {
+          "plugin": "strimzi",
+          "weeks": []
+        },
+        {
+          "plugin": "volcano",
+          "weeks": []
+        }
+      ]
+    }
+  ]
+}

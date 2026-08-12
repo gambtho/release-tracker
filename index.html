@@ -126,6 +126,7 @@ const COLORS = {
   linux: { bg: '#F5A623', bgFaded: 'rgba(245,166,35,0.45)' },
   mac:   { bg: '#4A90D9', bgFaded: 'rgba(74,144,217,0.45)' },
   win:   { bg: '#7ED321', bgFaded: 'rgba(126,211,33,0.45)' },
+  plugin:{ bg: '#BC7EE8', bgFaded: 'rgba(188,126,232,0.45)' },
 };
 
 const CHART_DEFAULTS = {
@@ -251,17 +252,9 @@ function buildMonthlyChartConfig(weeklyData) {
   };
 }
 
-function setupToggle(chartId, repoData, weeklyData) {
+function setupToggle(chartId, builders, hasWeekly) {
   const canvas = document.getElementById(chartId);
   if (!canvas) return;
-
-  const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
-
-  const builders = {
-    release: () => buildReleaseChartConfig(repoData),
-    weekly:  () => buildWeeklyChartConfig(weeklyData),
-    monthly: () => buildMonthlyChartConfig(weeklyData),
-  };
 
   const initialView = hasWeekly ? 'weekly' : 'release';
   let chart = new Chart(canvas, builders[initialView]());
@@ -280,6 +273,134 @@ function setupToggle(chartId, repoData, weeklyData) {
       chart = new Chart(canvas, builders[view]());
     });
   });
+}
+
+function buildPluginReleaseChartConfig(pluginData) {
+  const releases = pluginData.releases;
+
+  // A version can repeat within one plugin (legacy version-only tags bundled
+  // several plugins into one release, e.g. app-catalog 0.1.3 under both
+  // 'v0.1.4' and 'v0.1.3'). Identical labels would be indistinguishable, so
+  // any version appearing more than once is labelled by its unique tag.
+  const versionCounts = new Map();
+  for (const r of releases) {
+    versionCounts.set(r.version, (versionCounts.get(r.version) || 0) + 1);
+  }
+
+  const labels = releases.map(r => {
+    const base = versionCounts.get(r.version) > 1 ? r.tag : r.version;
+    return r.prerelease ? base + ' (pre)' : base;
+  });
+
+  return {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Downloads',
+          data: releases.map(r => r.downloads),
+          backgroundColor: releases.map(r => r.prerelease ? COLORS.plugin.bgFaded : COLORS.plugin.bg)
+        }
+      ]
+    },
+    options: {
+      ...CHART_DEFAULTS,
+      scales: {
+        ...CHART_DEFAULTS.scales,
+        x: { ...CHART_DEFAULTS.scales.x, ticks: { ...CHART_DEFAULTS.scales.x.ticks, font: { size: releases.length > 30 ? 9 : 11 } } }
+      }
+    }
+  };
+}
+
+function buildPluginWeeklyChartConfig(weeklyData) {
+  const weeks = weeklyData.weeks;
+  const labels = weeks.map(w => {
+    const d = new Date(w.week + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  });
+
+  return {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Downloads', data: weeks.map(w => w.downloads), backgroundColor: COLORS.plugin.bg }
+      ]
+    },
+    options: CHART_DEFAULTS
+  };
+}
+
+function aggregatePluginMonthly(weeklyData) {
+  // Group weekly entries by YYYY-MM (based on the Monday-of-week date) and sum.
+  const byMonth = new Map();
+  for (const w of weeklyData.weeks) {
+    const ym = w.week.slice(0, 7); // 'YYYY-MM'
+    const cur = byMonth.get(ym) || { month: ym, downloads: 0 };
+    cur.downloads += w.downloads;
+    byMonth.set(ym, cur);
+  }
+  return Array.from(byMonth.values()).sort((a, b) => a.month.localeCompare(b.month));
+}
+
+function buildPluginMonthlyChartConfig(weeklyData) {
+  const months = aggregatePluginMonthly(weeklyData);
+  const labels = months.map(m => {
+    const d = new Date(m.month + '-01T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  });
+
+  return {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Downloads', data: months.map(m => m.downloads), backgroundColor: COLORS.plugin.bg }
+      ]
+    },
+    options: CHART_DEFAULTS
+  };
+}
+
+function pluginChartId(repo, plugin) {
+  // Sanitize each component first: every non-alphanumeric becomes '-', so no
+  // component can contain '_'. That makes '_' a separator no component can forge,
+  // preventing (repo, plugin) pairs from colliding on the same DOM id.
+  const safe = s => s.replace(/[^A-Za-z0-9]/g, '-');
+  return 'chart-plugin-' + safe(repo) + '_' + safe(plugin);
+}
+
+function buildPluginCard(repo, pluginData, weeklyData) {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const repoUrl = 'https://github.com/' + repo;
+  const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
+  const chartId = pluginChartId(repo, pluginData.plugin);
+
+  let html = '<div class="card-header">'
+    + '<h2><a href="' + repoUrl + '" target="_blank">' + repo + '</a> &mdash; ' + pluginData.plugin + '</h2>'
+    + '<div class="stat">Total Downloads: <strong>' + fmt(pluginData.approx_all_time_downloads) + '</strong></div>'
+    + '</div>';
+
+  html += '<div class="chart-container">';
+
+  html += '<div class="toggle-bar">'
+    + '<button class="toggle-btn' + (hasWeekly ? '' : ' active') + '" data-view="release">By Release</button>';
+  if (hasWeekly) {
+    html += '<button class="toggle-btn active" data-view="weekly">By Week</button>'
+      + '<button class="toggle-btn" data-view="monthly">By Month</button>';
+  }
+  html += '</div>';
+
+  html += '<div style="position:relative;height:' + Math.max(300, pluginData.releases.length * 8) + 'px">'
+    + '<canvas id="' + chartId + '"></canvas>'
+    + '</div></div>';
+
+  card.innerHTML = html;
+  return card;
 }
 
 function buildCard(repoData, weeklyData) {
@@ -318,9 +439,11 @@ function buildCard(repoData, weeklyData) {
 async function init() {
   const content = document.getElementById('content');
   try {
-    const [dataResp, histResp] = await Promise.all([
+    const [dataResp, histResp, pluginResp, pluginHistResp] = await Promise.all([
       fetch('./data.json'),
-      fetch('./history.json').catch(() => null)
+      fetch('./history.json').catch(() => null),
+      fetch('./plugins.json').catch(() => null),
+      fetch('./plugins-history.json').catch(() => null)
     ]);
 
     if (!dataResp.ok) throw new Error('Failed to load data.json');
@@ -329,6 +452,16 @@ async function init() {
     let history = { repos: [] };
     if (histResp && histResp.ok) {
       history = await histResp.json();
+    }
+
+    let plugins = { repos: [] };
+    if (pluginResp && pluginResp.ok) {
+      plugins = await pluginResp.json();
+    }
+
+    let pluginHistory = { repos: [] };
+    if (pluginHistResp && pluginHistResp.ok) {
+      pluginHistory = await pluginHistResp.json();
     }
 
     // Update header
@@ -348,7 +481,37 @@ async function init() {
 
       // Setup toggle and render initial chart
       const chartId = 'chart-' + repoData.repo.replace(/\//g, '-');
-      setupToggle(chartId, repoData, weeklyData);
+      const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
+      setupToggle(chartId, {
+        release: () => buildReleaseChartConfig(repoData),
+        weekly:  () => buildWeeklyChartConfig(weeklyData),
+        monthly: () => buildMonthlyChartConfig(weeklyData),
+      }, hasWeekly);
+    }
+
+    // Plugin cards render after the platform cards. Failures here must not
+    // take down the platform cards, so this block swallows its own errors.
+    try {
+      for (const pluginRepo of (plugins.repos || [])) {
+        const histRepo = (pluginHistory.repos || []).find(r => r.repo === pluginRepo.repo);
+        for (const pluginData of (pluginRepo.plugins || [])) {
+          if (!pluginData.chart) continue;
+          const weeklyData = histRepo
+            ? (histRepo.plugins || []).find(p => p.plugin === pluginData.plugin)
+            : null;
+          const hasWeekly = weeklyData && weeklyData.weeks && weeklyData.weeks.length >= 2;
+
+          content.appendChild(buildPluginCard(pluginRepo.repo, pluginData, weeklyData));
+
+          setupToggle(pluginChartId(pluginRepo.repo, pluginData.plugin), {
+            release: () => buildPluginReleaseChartConfig(pluginData),
+            weekly:  () => buildPluginWeeklyChartConfig(weeklyData),
+            monthly: () => buildPluginMonthlyChartConfig(weeklyData),
+          }, hasWeekly);
+        }
+      }
+    } catch (pluginErr) {
+      console.error('Plugin cards failed to render:', pluginErr);
     }
 
   } catch (err) {
