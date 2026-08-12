@@ -114,7 +114,7 @@ All 21 plugins appear. `chart` is true only for plugins flagged in `plugins.csv`
 
 New arguments `--plugin-site-dir` and `--plugin-snapshots-dir`, writing `plugin-snapshots/YYYY-MM-DD.json` and `plugins-history.json`.
 
-The weekly-delta logic is refactored so `build_repo_index`, `diff_snapshots`, `compute_weekly_history`, and `build_history_json` take the metric keys as a parameter — `["linux", "mac", "win"]` for the platform track, `["downloads"]` for the plugin track — and are shared by both.
+The weekly-delta logic is refactored so `build_platform_index`, `diff_snapshots`, `compute_weekly_history`, and `build_history_json` take the metric keys as a parameter — `["linux", "mac", "win"]` for the platform track, `["downloads"]` for the plugin track — and are shared by both.
 
 Existing `snapshots/` and `history.json` are untouched. No migration; the accumulated platform history carries no risk.
 
