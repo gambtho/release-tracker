@@ -5,87 +5,192 @@
       "plugins": [
         {
           "plugin": "ai-assistant",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 717
+            }
+          ]
         },
         {
           "plugin": "app-catalog",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 504
+            }
+          ]
         },
         {
           "plugin": "argocd",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 4
+            }
+          ]
         },
         {
           "plugin": "backstage",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 8
+            }
+          ]
         },
         {
           "plugin": "cert-manager",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 500
+            }
+          ]
         },
         {
           "plugin": "change-logo",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 12
+            }
+          ]
         },
         {
           "plugin": "cluster-api",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 54
+            }
+          ]
         },
         {
           "plugin": "flux",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 688
+            }
+          ]
         },
         {
           "plugin": "karpenter",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 421
+            }
+          ]
         },
         {
           "plugin": "keda",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 323
+            }
+          ]
         },
         {
           "plugin": "knative",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 18
+            }
+          ]
         },
         {
           "plugin": "kompose",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 0
+            }
+          ]
         },
         {
           "plugin": "kro",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 1
+            }
+          ]
         },
         {
           "plugin": "kubeflow",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 0
+            }
+          ]
         },
         {
           "plugin": "minikube",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 129
+            }
+          ]
         },
         {
           "plugin": "opencost",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 136
+            }
+          ]
         },
         {
           "plugin": "plugin-catalog",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 506
+            }
+          ]
         },
         {
           "plugin": "prometheus",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 840
+            }
+          ]
         },
         {
           "plugin": "radius",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 0
+            }
+          ]
         },
         {
           "plugin": "strimzi",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 3
+            }
+          ]
         },
         {
           "plugin": "volcano",
-          "weeks": []
+          "weeks": [
+            {
+              "week": "2026-08-10",
+              "downloads": 1
+            }
+          ]
         }
       ]
     }
