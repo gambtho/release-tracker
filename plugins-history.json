@@ -16,7 +16,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 2201
+              "downloads": 3219
             }
           ]
         },
@@ -33,7 +33,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 1176
+              "downloads": 1610
             }
           ]
         },
@@ -50,7 +50,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 77
+              "downloads": 139
             }
           ]
         },
@@ -67,7 +67,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 6
+              "downloads": 22
             }
           ]
         },
@@ -84,7 +84,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 2235
+              "downloads": 3547
             }
           ]
         },
@@ -101,7 +101,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 9
+              "downloads": 22
             }
           ]
         },
@@ -118,7 +118,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 132
+              "downloads": 217
             }
           ]
         },
@@ -135,7 +135,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 2576
+              "downloads": 4226
             }
           ]
         },
@@ -152,7 +152,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 1143
+              "downloads": 1738
             }
           ]
         },
@@ -169,7 +169,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 985
+              "downloads": 1741
             }
           ]
         },
@@ -178,7 +178,7 @@
           "weeks": [
             {
               "week": "2026-08-24",
-              "downloads": 0
+              "downloads": 1
             }
           ]
         },
@@ -195,7 +195,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 40
+              "downloads": 58
             }
           ]
         },
@@ -212,7 +212,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 35
+              "downloads": 46
             }
           ]
         },
@@ -229,7 +229,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 2
+              "downloads": 4
             }
           ]
         },
@@ -246,7 +246,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 3
+              "downloads": 5
             }
           ]
         },
@@ -263,7 +263,16 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 152
+              "downloads": 261
+            }
+          ]
+        },
+        {
+          "plugin": "metal3",
+          "weeks": [
+            {
+              "week": "2026-08-24",
+              "downloads": 2
             }
           ]
         },
@@ -280,7 +289,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 347
+              "downloads": 505
             }
           ]
         },
@@ -297,7 +306,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 388
+              "downloads": 651
             }
           ]
         },
@@ -314,7 +323,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 1127
+              "downloads": 1555
             }
           ]
         },
@@ -331,7 +340,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 2008
+              "downloads": 2775
             }
           ]
         },
@@ -348,7 +357,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 0
+              "downloads": 1
             }
           ]
         },
@@ -365,7 +374,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 21
+              "downloads": 50
             }
           ]
         },
@@ -378,7 +387,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 1
+              "downloads": 2
             }
           ]
         },
@@ -395,7 +404,7 @@
             },
             {
               "week": "2026-08-24",
-              "downloads": 1
+              "downloads": 3
             }
           ]
         }
