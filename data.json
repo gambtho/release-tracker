@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-11-12T14:47:05Z",
+  "generated_at": "2026-11-13T14:05:37Z",
   "repos": [
     {
       "repo": "Azure/aks-desktop",
-      "approx_all_time_release_downloads": 14693,
+      "approx_all_time_release_downloads": 14979,
       "releases": [
         {
           "tag": "v0.1.0-alpha",
           "name": "v0.1.0-alpha",
           "published_at": "2025-11-19T22:51:24Z",
           "prerelease": false,
-          "download_total": 1959,
+          "download_total": 1960,
           "linux": 32,
           "mac": 710,
-          "win": 1217
+          "win": 1218
         },
         {
           "tag": "v0.2.0-alpha",
@@ -70,20 +70,20 @@
           "name": "v0.7.0",
           "published_at": "2026-06-02T21:01:46Z",
           "prerelease": false,
-          "download_total": 395,
+          "download_total": 396,
           "linux": 30,
           "mac": 253,
-          "win": 112
+          "win": 113
         },
         {
           "tag": "v0.8.0",
           "name": "v0.8.0",
           "published_at": "2026-06-16T20:10:42Z",
           "prerelease": false,
-          "download_total": 1433,
+          "download_total": 1434,
           "linux": 33,
           "mac": 401,
-          "win": 999
+          "win": 1000
         },
         {
           "tag": "v0.9.0",
@@ -100,10 +100,10 @@
           "name": "v0.9.1",
           "published_at": "2026-07-30T17:29:43Z",
           "prerelease": false,
-          "download_total": 4979,
+          "download_total": 4989,
           "linux": 69,
           "mac": 790,
-          "win": 4120
+          "win": 4130
         },
         {
           "tag": "v0.10.0-rc1",
@@ -120,10 +120,10 @@
           "name": "v0.10.0",
           "published_at": "2026-09-24T13:41:42Z",
           "prerelease": false,
-          "download_total": 2019,
+          "download_total": 2037,
           "linux": 125,
-          "mac": 710,
-          "win": 1184
+          "mac": 713,
+          "win": 1199
         },
         {
           "tag": "v0.11.0-rc1",
@@ -140,16 +140,26 @@
           "name": "0.11.0-rc2",
           "published_at": "2026-11-11T19:53:15Z",
           "prerelease": true,
-          "download_total": 17,
+          "download_total": 19,
           "linux": 8,
-          "mac": 4,
-          "win": 5
+          "mac": 5,
+          "win": 6
+        },
+        {
+          "tag": "v0.11.0",
+          "name": "v0.11.0",
+          "published_at": "2026-11-12T17:36:05Z",
+          "prerelease": false,
+          "download_total": 253,
+          "linux": 25,
+          "mac": 106,
+          "win": 122
         }
       ]
     },
     {
       "repo": "kubernetes-sigs/headlamp",
-      "approx_all_time_release_downloads": 550144,
+      "approx_all_time_release_downloads": 551368,
       "releases": [
         {
           "tag": "v0.1.2",
@@ -176,8 +186,8 @@
           "name": "v0.2.0",
           "published_at": "2021-01-14T22:28:04Z",
           "prerelease": false,
-          "download_total": 269,
-          "linux": 106,
+          "download_total": 270,
+          "linux": 107,
           "mac": 132,
           "win": 31
         },
@@ -306,8 +316,8 @@
           "name": "0.9.0",
           "published_at": "2022-05-13T16:53:13Z",
           "prerelease": false,
-          "download_total": 233,
-          "linux": 131,
+          "download_total": 238,
+          "linux": 136,
           "mac": 58,
           "win": 44
         },
@@ -336,8 +346,8 @@
           "name": "0.11.0",
           "published_at": "2022-07-14T16:23:27Z",
           "prerelease": false,
-          "download_total": 288,
-          "linux": 147,
+          "download_total": 290,
+          "linux": 149,
           "mac": 87,
           "win": 54
         },
@@ -406,8 +416,8 @@
           "name": "0.15.0",
           "published_at": "2023-02-02T16:38:10Z",
           "prerelease": false,
-          "download_total": 825,
-          "linux": 333,
+          "download_total": 828,
+          "linux": 336,
           "mac": 301,
           "win": 191
         },
@@ -476,8 +486,8 @@
           "name": "0.19.1",
           "published_at": "2023-08-24T16:48:37Z",
           "prerelease": false,
-          "download_total": 1484,
-          "linux": 314,
+          "download_total": 1487,
+          "linux": 317,
           "mac": 602,
           "win": 568
         },
@@ -496,340 +506,340 @@
           "name": "0.20.1",
           "published_at": "2023-10-05T20:30:37Z",
           "prerelease": false,
-          "download_total": 3795,
-          "linux": 642,
+          "download_total": 3800,
+          "linux": 646,
           "mac": 836,
-          "win": 2317
+          "win": 2318
         },
         {
           "tag": "v0.21.0",
           "name": "0.21.0",
           "published_at": "2023-11-07T23:18:14Z",
           "prerelease": false,
-          "download_total": 4039,
+          "download_total": 4040,
           "linux": 382,
           "mac": 1120,
-          "win": 2537
+          "win": 2538
         },
         {
           "tag": "v0.22.0",
           "name": "0.22.0",
           "published_at": "2023-12-20T23:13:24Z",
           "prerelease": false,
-          "download_total": 5670,
-          "linux": 801,
+          "download_total": 5675,
+          "linux": 805,
           "mac": 1529,
-          "win": 3340
+          "win": 3341
         },
         {
           "tag": "v0.23.0",
           "name": "0.23.0",
           "published_at": "2024-03-06T21:06:25Z",
           "prerelease": false,
-          "download_total": 3277,
-          "linux": 445,
+          "download_total": 3281,
+          "linux": 448,
           "mac": 910,
-          "win": 1922
+          "win": 1923
         },
         {
           "tag": "v0.23.1",
           "name": "0.23.1",
           "published_at": "2024-03-27T13:30:04Z",
           "prerelease": false,
-          "download_total": 4078,
-          "linux": 490,
+          "download_total": 4082,
+          "linux": 493,
           "mac": 1346,
-          "win": 2242
+          "win": 2243
         },
         {
           "tag": "v0.23.2",
           "name": "0.23.2",
           "published_at": "2024-05-02T21:50:33Z",
           "prerelease": false,
-          "download_total": 3983,
-          "linux": 511,
+          "download_total": 3987,
+          "linux": 514,
           "mac": 1175,
-          "win": 2297
+          "win": 2298
         },
         {
           "tag": "v0.24.0",
           "name": "0.24.0",
           "published_at": "2024-05-29T23:43:22Z",
           "prerelease": false,
-          "download_total": 4683,
+          "download_total": 4684,
           "linux": 697,
           "mac": 1529,
-          "win": 2457
+          "win": 2458
         },
         {
           "tag": "v0.24.1",
           "name": "0.24.1",
           "published_at": "2024-06-27T17:45:52Z",
           "prerelease": false,
-          "download_total": 4636,
+          "download_total": 4637,
           "linux": 619,
           "mac": 1594,
-          "win": 2423
+          "win": 2424
         },
         {
           "tag": "v0.25.0",
           "name": "0.25.0",
           "published_at": "2024-07-29T21:21:48Z",
           "prerelease": false,
-          "download_total": 6125,
+          "download_total": 6126,
           "linux": 1045,
           "mac": 2359,
-          "win": 2721
+          "win": 2722
         },
         {
           "tag": "v0.25.1",
           "name": "0.25.1",
           "published_at": "2024-09-03T20:11:09Z",
           "prerelease": false,
-          "download_total": 9808,
+          "download_total": 9809,
           "linux": 1751,
           "mac": 3847,
-          "win": 4210
+          "win": 4211
         },
         {
           "tag": "v0.26.0",
           "name": "0.26.0",
           "published_at": "2024-11-06T14:57:21Z",
           "prerelease": false,
-          "download_total": 9056,
-          "linux": 1300,
+          "download_total": 9060,
+          "linux": 1303,
           "mac": 3631,
-          "win": 4125
+          "win": 4126
         },
         {
           "tag": "v0.27.0",
           "name": "0.27.0",
           "published_at": "2024-12-12T22:02:39Z",
           "prerelease": false,
-          "download_total": 9053,
+          "download_total": 9054,
           "linux": 1325,
           "mac": 3935,
-          "win": 3793
+          "win": 3794
         },
         {
           "tag": "v0.28.0",
           "name": "0.28.0",
           "published_at": "2025-01-23T18:41:55Z",
           "prerelease": false,
-          "download_total": 6292,
+          "download_total": 6293,
           "linux": 874,
           "mac": 2823,
-          "win": 2595
+          "win": 2596
         },
         {
           "tag": "v0.28.1",
           "name": "0.28.1",
           "published_at": "2025-02-07T14:18:22Z",
           "prerelease": false,
-          "download_total": 6983,
+          "download_total": 6985,
           "linux": 934,
           "mac": 3160,
-          "win": 2889
+          "win": 2891
         },
         {
           "tag": "v0.29.0",
           "name": "0.29.0",
           "published_at": "2025-02-26T16:11:29Z",
           "prerelease": false,
-          "download_total": 9413,
-          "linux": 1213,
+          "download_total": 9417,
+          "linux": 1216,
           "mac": 4377,
-          "win": 3823
+          "win": 3824
         },
         {
           "tag": "v0.30.0",
           "name": "0.30.0",
           "published_at": "2025-03-27T22:50:59Z",
           "prerelease": false,
-          "download_total": 20697,
-          "linux": 3106,
-          "mac": 9991,
-          "win": 7600
+          "download_total": 20702,
+          "linux": 3109,
+          "mac": 9992,
+          "win": 7601
         },
         {
           "tag": "v0.31.0",
           "name": "0.31.0",
           "published_at": "2025-05-30T00:10:03Z",
           "prerelease": false,
-          "download_total": 6934,
+          "download_total": 6935,
           "linux": 888,
           "mac": 3896,
-          "win": 2150
+          "win": 2151
         },
         {
           "tag": "v0.31.1",
           "name": "0.31.1",
           "published_at": "2025-06-05T15:34:26Z",
           "prerelease": false,
-          "download_total": 11632,
+          "download_total": 11633,
           "linux": 1497,
           "mac": 6339,
-          "win": 3796
+          "win": 3797
         },
         {
           "tag": "v0.32.0",
           "name": "0.32.0",
           "published_at": "2025-06-26T13:18:18Z",
           "prerelease": false,
-          "download_total": 10486,
+          "download_total": 10487,
           "linux": 1226,
           "mac": 5720,
-          "win": 3540
+          "win": 3541
         },
         {
           "tag": "v0.33.0",
           "name": "0.33.0",
           "published_at": "2025-07-17T20:32:25Z",
           "prerelease": false,
-          "download_total": 9846,
+          "download_total": 9847,
           "linux": 1379,
           "mac": 4791,
-          "win": 3676
+          "win": 3677
         },
         {
           "tag": "v0.34.0",
           "name": "0.34.0",
           "published_at": "2025-07-31T13:52:34Z",
           "prerelease": false,
-          "download_total": 15857,
+          "download_total": 15859,
           "linux": 1893,
           "mac": 8502,
-          "win": 5462
+          "win": 5464
         },
         {
           "tag": "v0.35.0",
           "name": "0.35.0",
           "published_at": "2025-09-02T17:12:12Z",
           "prerelease": false,
-          "download_total": 15852,
+          "download_total": 15853,
           "linux": 2232,
           "mac": 8155,
-          "win": 5465
+          "win": 5466
         },
         {
           "tag": "v0.36.0",
           "name": "0.36.0",
           "published_at": "2025-10-02T17:07:22Z",
           "prerelease": false,
-          "download_total": 15638,
-          "linux": 2380,
+          "download_total": 15642,
+          "linux": 2383,
           "mac": 8137,
-          "win": 5121
+          "win": 5122
         },
         {
           "tag": "v0.37.0",
           "name": "0.37.0",
           "published_at": "2025-10-30T22:30:35Z",
           "prerelease": false,
-          "download_total": 9249,
-          "linux": 1586,
+          "download_total": 9253,
+          "linux": 1589,
           "mac": 4502,
-          "win": 3161
+          "win": 3162
         },
         {
           "tag": "v0.38.0",
           "name": "0.38.0",
           "published_at": "2025-11-11T19:45:10Z",
           "prerelease": false,
-          "download_total": 19123,
-          "linux": 2620,
+          "download_total": 19128,
+          "linux": 2624,
           "mac": 10188,
-          "win": 6315
+          "win": 6316
         },
         {
           "tag": "v0.39.0",
           "name": "0.39.0",
           "published_at": "2025-12-17T13:45:27Z",
           "prerelease": false,
-          "download_total": 25680,
+          "download_total": 25681,
           "linux": 3981,
           "mac": 13687,
-          "win": 8012
+          "win": 8013
         },
         {
           "tag": "v0.40.0",
           "name": "0.40.0",
           "published_at": "2026-02-05T16:58:20Z",
           "prerelease": false,
-          "download_total": 7853,
+          "download_total": 7856,
           "linux": 1264,
           "mac": 3745,
-          "win": 2844
+          "win": 2847
         },
         {
           "tag": "v0.40.1",
           "name": "0.40.1",
           "published_at": "2026-02-10T18:33:01Z",
           "prerelease": false,
-          "download_total": 26570,
-          "linux": 4489,
+          "download_total": 26577,
+          "linux": 4492,
           "mac": 14536,
-          "win": 7545
+          "win": 7549
         },
         {
           "tag": "v0.41.0",
           "name": "0.41.0",
           "published_at": "2026-03-23T19:09:16Z",
           "prerelease": false,
-          "download_total": 39172,
+          "download_total": 39173,
           "linux": 5458,
           "mac": 22921,
-          "win": 10793
+          "win": 10794
         },
         {
           "tag": "v0.42.0",
           "name": "0.42.0",
           "published_at": "2026-05-07T11:45:04Z",
           "prerelease": false,
-          "download_total": 30193,
+          "download_total": 30195,
           "linux": 2804,
           "mac": 18254,
-          "win": 9135
+          "win": 9137
         },
         {
           "tag": "v0.43.0",
           "name": "0.43.0",
           "published_at": "2026-06-16T22:41:58Z",
           "prerelease": false,
-          "download_total": 41868,
-          "linux": 4765,
+          "download_total": 41874,
+          "linux": 4769,
           "mac": 25816,
-          "win": 11287
+          "win": 11289
         },
         {
           "tag": "v0.44.0",
           "name": "0.44.0",
           "published_at": "2026-07-29T07:10:29Z",
           "prerelease": false,
-          "download_total": 30954,
+          "download_total": 30959,
           "linux": 2760,
           "mac": 20199,
-          "win": 7995
+          "win": 8000
         },
         {
           "tag": "v0.45.0",
           "name": "0.45.0",
           "published_at": "2026-08-20T23:55:46Z",
           "prerelease": false,
-          "download_total": 61742,
-          "linux": 5458,
-          "mac": 41221,
-          "win": 15063
+          "download_total": 61755,
+          "linux": 5459,
+          "mac": 41222,
+          "win": 15074
         },
         {
           "tag": "v0.46.0",
           "name": "0.46.0",
           "published_at": "2026-10-15T23:14:36Z",
           "prerelease": false,
-          "download_total": 40898,
-          "linux": 4102,
-          "mac": 26072,
-          "win": 10724
+          "download_total": 42006,
+          "linux": 4213,
+          "mac": 26770,
+          "win": 11023
         }
       ]
     }
