@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-20T15:00:07Z",
+  "generated_at": "2026-11-21T14:21:46Z",
   "repos": [
     {
       "repo": "headlamp-k8s/plugins",
@@ -7,56 +7,56 @@
         {
           "plugin": "ai-assistant",
           "chart": true,
-          "approx_all_time_downloads": 183458,
+          "approx_all_time_downloads": 184301,
           "releases": [
             {
               "tag": "ai-assistant-0.1.0-alpha",
               "version": "0.1.0-alpha",
               "published_at": "2025-08-07T14:04:34Z",
               "prerelease": false,
-              "downloads": 117415
+              "downloads": 117786
             },
             {
               "tag": "ai-assistant-0.2.0-alpha",
               "version": "0.2.0-alpha",
               "published_at": "2026-03-23T09:09:15Z",
               "prerelease": false,
-              "downloads": 54551
+              "downloads": 54858
             },
             {
               "tag": "ai-assistant-0.3.0-alpha",
               "version": "0.3.0-alpha",
               "published_at": "2026-07-16T17:01:31Z",
               "prerelease": false,
-              "downloads": 3835
+              "downloads": 3874
             },
             {
               "tag": "ai-assistant-0.4.0-alpha",
               "version": "0.4.0-alpha",
               "published_at": "2026-08-25T20:21:17Z",
               "prerelease": false,
-              "downloads": 1596
+              "downloads": 1613
             },
             {
               "tag": "ai-assistant-0.4.1-alpha",
               "version": "0.4.1-alpha",
               "published_at": "2026-09-21T12:51:02Z",
               "prerelease": false,
-              "downloads": 4604
+              "downloads": 4634
             },
             {
               "tag": "ai-assistant-0.5.0-alpha",
               "version": "0.5.0-alpha",
               "published_at": "2026-11-09T15:32:02Z",
               "prerelease": false,
-              "downloads": 1457
+              "downloads": 1536
             }
           ]
         },
         {
           "plugin": "app-catalog",
           "chart": false,
-          "approx_all_time_downloads": 95597,
+          "approx_all_time_downloads": 95970,
           "releases": [
             {
               "tag": "v0.1.0",
@@ -175,7 +175,7 @@
               "version": "0.8.0",
               "published_at": "2025-12-15T16:23:55Z",
               "prerelease": false,
-              "downloads": 21990
+              "downloads": 21992
             },
             {
               "tag": "app-catalog-0.9.0",
@@ -189,28 +189,28 @@
               "version": "0.9.1",
               "published_at": "2026-07-28T09:25:03Z",
               "prerelease": false,
-              "downloads": 29734
+              "downloads": 30105
             }
           ]
         },
         {
           "plugin": "argocd",
           "chart": false,
-          "approx_all_time_downloads": 10225,
+          "approx_all_time_downloads": 10273,
           "releases": [
             {
               "tag": "argocd-0.1.0-alpha",
               "version": "0.1.0-alpha",
               "published_at": "2026-08-11T12:46:37Z",
               "prerelease": false,
-              "downloads": 10225
+              "downloads": 10273
             }
           ]
         },
         {
           "plugin": "backstage",
           "chart": false,
-          "approx_all_time_downloads": 4057,
+          "approx_all_time_downloads": 4085,
           "releases": [
             {
               "tag": "backstage-0.1.0-beta-1",
@@ -224,56 +224,56 @@
               "version": "0.1.0-beta-2",
               "published_at": "2025-10-16T13:28:12Z",
               "prerelease": false,
-              "downloads": 1686
+              "downloads": 1689
             },
             {
               "tag": "backstage-0.1.0-beta-3",
               "version": "0.1.0-beta-3",
               "published_at": "2026-06-08T06:44:12Z",
               "prerelease": false,
-              "downloads": 1504
+              "downloads": 1529
             }
           ]
         },
         {
           "plugin": "cert-manager",
           "chart": false,
-          "approx_all_time_downloads": 221620,
+          "approx_all_time_downloads": 222059,
           "releases": [
             {
               "tag": "cert-manager-0.1.0",
               "version": "0.1.0",
               "published_at": "2025-02-21T14:59:59Z",
               "prerelease": false,
-              "downloads": 178441
+              "downloads": 178610
             },
             {
               "tag": "cert-manager-0.1.1",
               "version": "0.1.1",
               "published_at": "2026-05-27T15:37:28Z",
               "prerelease": false,
-              "downloads": 43179
+              "downloads": 43449
             }
           ]
         },
         {
           "plugin": "change-logo",
           "chart": false,
-          "approx_all_time_downloads": 4206,
+          "approx_all_time_downloads": 4232,
           "releases": [
             {
               "tag": "example-change-logo-0.0.1",
               "version": "0.0.1",
               "published_at": "2024-07-24T14:22:56Z",
               "prerelease": false,
-              "downloads": 4206
+              "downloads": 4232
             }
           ]
         },
         {
           "plugin": "cluster-api",
           "chart": false,
-          "approx_all_time_downloads": 4834,
+          "approx_all_time_downloads": 4851,
           "releases": [
             {
               "tag": "cluster-api-0.1.0-alpha",
@@ -287,14 +287,14 @@
               "version": "0.2.0-beta",
               "published_at": "2026-06-05T14:42:28Z",
               "prerelease": false,
-              "downloads": 3951
+              "downloads": 3968
             }
           ]
         },
         {
           "plugin": "flux",
           "chart": false,
-          "approx_all_time_downloads": 228454,
+          "approx_all_time_downloads": 229224,
           "releases": [
             {
               "tag": "flux-0.1.0-beta-1",
@@ -315,7 +315,7 @@
               "version": "0.2.0",
               "published_at": "2025-03-26T23:35:01Z",
               "prerelease": false,
-              "downloads": 8891
+              "downloads": 8892
             },
             {
               "tag": "flux-0.3.0",
@@ -329,70 +329,70 @@
               "version": "0.4.0",
               "published_at": "2025-07-17T14:54:30Z",
               "prerelease": false,
-              "downloads": 14390
+              "downloads": 14393
             },
             {
               "tag": "flux-0.5.0",
               "version": "0.5.0",
               "published_at": "2025-10-27T12:28:30Z",
               "prerelease": false,
-              "downloads": 89036
+              "downloads": 89127
             },
             {
               "tag": "flux-0.6.0",
               "version": "0.6.0",
               "published_at": "2026-03-20T16:07:42Z",
               "prerelease": false,
-              "downloads": 78593
+              "downloads": 78721
             },
             {
               "tag": "flux-0.7.0",
               "version": "0.7.0",
               "published_at": "2026-07-30T10:57:55Z",
               "prerelease": false,
-              "downloads": 31687
+              "downloads": 31829
             },
             {
               "tag": "flux-0.8.0",
               "version": "0.8.0",
               "published_at": "2026-11-09T22:31:36Z",
               "prerelease": false,
-              "downloads": 3549
+              "downloads": 3954
             }
           ]
         },
         {
           "plugin": "karpenter",
           "chart": false,
-          "approx_all_time_downloads": 100739,
+          "approx_all_time_downloads": 101093,
           "releases": [
             {
               "tag": "karpenter-0.1.0-alpha-0",
               "version": "0.1.0-alpha-0",
               "published_at": "2025-07-25T20:51:12Z",
               "prerelease": false,
-              "downloads": 834
+              "downloads": 837
             },
             {
               "tag": "karpenter-0.1.0",
               "version": "0.1.0",
               "published_at": "2025-08-30T07:43:45Z",
               "prerelease": false,
-              "downloads": 19390
+              "downloads": 19396
             },
             {
               "tag": "karpenter-0.2.0",
               "version": "0.2.0",
               "published_at": "2026-02-10T22:46:14Z",
               "prerelease": false,
-              "downloads": 80515
+              "downloads": 80860
             }
           ]
         },
         {
           "plugin": "keda",
           "chart": false,
-          "approx_all_time_downloads": 121192,
+          "approx_all_time_downloads": 121484,
           "releases": [
             {
               "tag": "keda-0.1.0-beta",
@@ -406,14 +406,14 @@
               "version": "0.1.1-beta",
               "published_at": "2025-07-22T11:10:22Z",
               "prerelease": false,
-              "downloads": 95930
+              "downloads": 96028
             },
             {
               "tag": "keda-0.1.2",
               "version": "0.1.2",
               "published_at": "2026-06-18T18:01:17Z",
               "prerelease": false,
-              "downloads": 25148
+              "downloads": 25342
             }
           ]
         },
@@ -434,35 +434,35 @@
         {
           "plugin": "knative",
           "chart": false,
-          "approx_all_time_downloads": 6540,
+          "approx_all_time_downloads": 6565,
           "releases": [
             {
               "tag": "knative-0.2.0-alpha",
               "version": "0.2.0-alpha",
               "published_at": "2026-04-02T10:29:53Z",
               "prerelease": false,
-              "downloads": 334
+              "downloads": 340
             },
             {
               "tag": "knative-0.3.0-beta",
               "version": "0.3.0-beta",
               "published_at": "2026-05-28T17:29:21Z",
               "prerelease": false,
-              "downloads": 6070
+              "downloads": 6076
             },
             {
               "tag": "knative-0.4.0-beta",
               "version": "0.4.0-beta",
               "published_at": "2026-11-08T14:50:53Z",
               "prerelease": false,
-              "downloads": 136
+              "downloads": 149
             }
           ]
         },
         {
           "plugin": "kompose",
           "chart": false,
-          "approx_all_time_downloads": 8989,
+          "approx_all_time_downloads": 9026,
           "releases": [
             {
               "tag": "kompose-0.1.0-beta",
@@ -476,7 +476,7 @@
               "version": "0.1.1-beta",
               "published_at": "2025-06-25T19:28:29Z",
               "prerelease": false,
-              "downloads": 6350
+              "downloads": 6387
             }
           ]
         },
@@ -504,7 +504,7 @@
         {
           "plugin": "kubeflow",
           "chart": false,
-          "approx_all_time_downloads": 2079,
+          "approx_all_time_downloads": 2089,
           "releases": [
             {
               "tag": "kubeflow-0.1.0-alpha",
@@ -518,49 +518,49 @@
               "version": "0.2.0-alpha",
               "published_at": "2026-05-13T06:33:37Z",
               "prerelease": false,
-              "downloads": 2058
+              "downloads": 2068
             }
           ]
         },
         {
           "plugin": "kueue",
           "chart": false,
-          "approx_all_time_downloads": 1754,
+          "approx_all_time_downloads": 1797,
           "releases": [
             {
               "tag": "kueue-0.1.0-alpha",
               "version": "0.1.0-alpha",
               "published_at": "2026-08-28T12:57:46Z",
               "prerelease": false,
-              "downloads": 1743
+              "downloads": 1780
             },
             {
               "tag": "kueue-0.2.0-alpha",
               "version": "0.2.0-alpha",
               "published_at": "2026-11-08T13:37:46Z",
               "prerelease": false,
-              "downloads": 11
+              "downloads": 17
             }
           ]
         },
         {
           "plugin": "kyverno",
           "chart": false,
-          "approx_all_time_downloads": 16091,
+          "approx_all_time_downloads": 16182,
           "releases": [
             {
               "tag": "kyverno-0.1.0",
               "version": "0.1.0",
               "published_at": "2026-06-21T14:31:08Z",
               "prerelease": false,
-              "downloads": 15724
+              "downloads": 15784
             },
             {
               "tag": "kyverno-0.2.0-alpha",
               "version": "0.2.0-alpha",
               "published_at": "2026-11-05T11:23:07Z",
               "prerelease": false,
-              "downloads": 367
+              "downloads": 398
             }
           ]
         },
@@ -581,7 +581,7 @@
         {
           "plugin": "minikube",
           "chart": false,
-          "approx_all_time_downloads": 14139,
+          "approx_all_time_downloads": 14252,
           "releases": [
             {
               "tag": "minikube-0.1.0-alpha-1",
@@ -609,7 +609,7 @@
               "version": "0.3.0",
               "published_at": "2026-04-15T10:53:21Z",
               "prerelease": false,
-              "downloads": 13134
+              "downloads": 13247
             }
           ]
         },
@@ -630,7 +630,7 @@
         {
           "plugin": "opencost",
           "chart": false,
-          "approx_all_time_downloads": 52036,
+          "approx_all_time_downloads": 52167,
           "releases": [
             {
               "tag": "opencost-0.1.0",
@@ -658,14 +658,14 @@
               "version": "0.1.3",
               "published_at": "2024-11-06T11:51:18Z",
               "prerelease": false,
-              "downloads": 51713
+              "downloads": 51844
             }
           ]
         },
         {
           "plugin": "plugin-catalog",
           "chart": false,
-          "approx_all_time_downloads": 86738,
+          "approx_all_time_downloads": 87110,
           "releases": [
             {
               "tag": "plugin-catalog-0.1.0",
@@ -728,28 +728,28 @@
               "version": "0.4.3",
               "published_at": "2025-12-16T12:10:24Z",
               "prerelease": false,
-              "downloads": 21955
+              "downloads": 21958
             },
             {
               "tag": "plugin-catalog-0.4.4",
               "version": "0.4.4",
               "published_at": "2026-06-09T12:47:31Z",
               "prerelease": false,
-              "downloads": 34549
+              "downloads": 34550
             },
             {
               "tag": "plugin-catalog-0.4.5",
               "version": "0.4.5",
               "published_at": "2026-10-15T16:21:31Z",
               "prerelease": false,
-              "downloads": 7429
+              "downloads": 7797
             }
           ]
         },
         {
           "plugin": "prometheus",
           "chart": false,
-          "approx_all_time_downloads": 161198,
+          "approx_all_time_downloads": 161770,
           "releases": [
             {
               "tag": "v0.1.4-alpha",
@@ -854,14 +854,14 @@
               "version": "0.7.2",
               "published_at": "2025-07-30T10:49:07Z",
               "prerelease": false,
-              "downloads": 6520
+              "downloads": 6523
             },
             {
               "tag": "prometheus-0.8.0",
               "version": "0.8.0",
               "published_at": "2025-10-01T14:07:00Z",
               "prerelease": false,
-              "downloads": 10067
+              "downloads": 10072
             },
             {
               "tag": "prometheus-0.8.1",
@@ -875,21 +875,21 @@
               "version": "0.8.2",
               "published_at": "2026-02-04T16:31:30Z",
               "prerelease": false,
-              "downloads": 37713
+              "downloads": 37723
             },
             {
               "tag": "prometheus-0.9.0",
               "version": "0.9.0",
               "published_at": "2026-06-09T16:24:35Z",
               "prerelease": false,
-              "downloads": 22726
+              "downloads": 22731
             },
             {
               "tag": "prometheus-0.9.1",
               "version": "0.9.1",
               "published_at": "2026-07-28T09:23:43Z",
               "prerelease": false,
-              "downloads": 44205
+              "downloads": 44754
             }
           ]
         },
@@ -910,21 +910,21 @@
         {
           "plugin": "strimzi",
           "chart": false,
-          "approx_all_time_downloads": 3683,
+          "approx_all_time_downloads": 3712,
           "releases": [
             {
               "tag": "strimzi-0.4.0-alpha",
               "version": "0.4.0-alpha",
               "published_at": "2026-04-13T20:48:48Z",
               "prerelease": false,
-              "downloads": 1347
+              "downloads": 1354
             },
             {
               "tag": "strimzi-0.5.0-beta",
               "version": "0.5.0-beta",
               "published_at": "2026-07-30T13:50:03Z",
               "prerelease": false,
-              "downloads": 2336
+              "downloads": 2358
             }
           ]
         },
@@ -945,14 +945,14 @@
         {
           "plugin": "velero",
           "chart": false,
-          "approx_all_time_downloads": 97,
+          "approx_all_time_downloads": 99,
           "releases": [
             {
               "tag": "velero-0.1.0-alpha",
               "version": "0.1.0-alpha",
               "published_at": "2026-11-08T14:03:55Z",
               "prerelease": false,
-              "downloads": 97
+              "downloads": 99
             }
           ]
         },
